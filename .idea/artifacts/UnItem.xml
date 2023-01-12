@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="UnItem">
+    <output-path>$PROJECT_DIR$/out/artifacts/UnItem</output-path>
+    <root id="archive" name="UnItem.jar">
+      <element id="module-output" name="unItem" />
+    </root>
+  </artifact>
+</component>
