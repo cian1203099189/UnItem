@@ -20,10 +20,7 @@ import cn.hellp.touch.unitem.selector.entity.living.player.OnlinePlayerSelector;
 import cn.hellp.touch.unitem.selector.item.GetItemInHand;
 import cn.hellp.touch.unitem.selector.location.LocationOfEntitySelector;
 import cn.hellp.touch.unitem.selector.location.LocationValueSelector;
-import cn.hellp.touch.unitem.selector.tools.ActuatorSelector;
-import cn.hellp.touch.unitem.selector.tools.ArraySelector;
-import cn.hellp.touch.unitem.selector.tools.GetFromIndexSelector;
-import cn.hellp.touch.unitem.selector.tools.ToStringSelector;
+import cn.hellp.touch.unitem.selector.tools.*;
 import cn.hellp.touch.unitem.selector.tools.block.GetBlockType;
 import cn.hellp.touch.unitem.selector.tools.entity.GetDirection;
 import cn.hellp.touch.unitem.selector.tools.entity.GetFoodLevelSelector;
@@ -73,6 +70,8 @@ public class SentenceFactory {
         actuatorMap.put(actuator.actuatorID(), actuator);
         actuator=new SetItemStackTypeActuator();
         actuatorMap.put(actuator.actuatorID(), actuator);
+        actuator=new SetVelocityActuator();
+        actuatorMap.put(actuator.actuatorID(),actuator);
 
         Constructor<?> selectorConstructor;
         try {
@@ -152,6 +151,9 @@ public class SentenceFactory {
 
             selectorConstructor = ConcatString.class.getDeclaredConstructor(ISelector.class,ISelector.class);
             selectorCreateMap.put("concatString",listOf(selectorConstructor));
+
+            selectorConstructor = VectorToLocationSelector.class.getDeclaredConstructor(ISelector.class);
+            selectorCreateMap.put("vecToLocation",listOf(selectorConstructor));
         } catch (NoSuchMethodException e) {
             throw new ERROR(e);
         }
