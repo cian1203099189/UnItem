@@ -1,5 +1,6 @@
 package cn.hellp.touch.unitem.selector.tools.number;
 
+import cn.hellp.touch.unitem.auxiliary.ERROR;
 import cn.hellp.touch.unitem.selector.ISelector;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -54,6 +55,11 @@ public class AddNumber implements ISelector {
                     continue;
                 } catch (Exception ignored) {}
                 try {
+                    added= ((Short) o1 + (Short) o2);
+                    result.add(added);
+                    continue;
+                } catch (Exception ignored) {}
+                try {
                     added= ((Location) o1).add(((Location) o2));
                     result.add(added);
                     continue;
@@ -69,7 +75,7 @@ public class AddNumber implements ISelector {
                     result.add(added);
                     continue;
                 }catch (Exception ignored) {}
-                throw new RuntimeException("can't add object "+o1);
+                throw new ERROR("can't add object "+o1);
             }
         }
         return result.toArray(new Object[0]);

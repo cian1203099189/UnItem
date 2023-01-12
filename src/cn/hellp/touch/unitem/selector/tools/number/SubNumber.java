@@ -1,5 +1,6 @@
 package cn.hellp.touch.unitem.selector.tools.number;
 
+import cn.hellp.touch.unitem.auxiliary.ERROR;
 import cn.hellp.touch.unitem.selector.ISelector;
 import org.bukkit.entity.Player;
 
@@ -44,7 +45,7 @@ public class SubNumber implements ISelector {
                     result.add(added);
                     continue;
                 } catch (Exception ignored) {}
-                throw new RuntimeException(o1+" is not a number");
+                throw new ERROR(o1+" is not a number");
             }
         }
         return result.toArray(new Object[0]);

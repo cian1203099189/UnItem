@@ -19,6 +19,10 @@ import cn.hellp.touch.unitem.selector.entity.living.player.OnlinePlayerSelector;
 import cn.hellp.touch.unitem.selector.item.GetItemInHand;
 import cn.hellp.touch.unitem.selector.location.LocationOfEntitySelector;
 import cn.hellp.touch.unitem.selector.location.LocationValueSelector;
+import cn.hellp.touch.unitem.selector.predicate.Equals;
+import cn.hellp.touch.unitem.selector.predicate.Greater;
+import cn.hellp.touch.unitem.selector.predicate.Less;
+import cn.hellp.touch.unitem.selector.predicate.logical.Un;
 import cn.hellp.touch.unitem.selector.tools.*;
 import cn.hellp.touch.unitem.selector.tools.block.GetBlockType;
 import cn.hellp.touch.unitem.selector.tools.entity.GetDirection;
@@ -241,6 +245,10 @@ public class SentenceFactory {
         Pattern selector = Pattern.compile("(?<selectorName>\\w*)?\\((?<pragma>.*)\\)");
         Pattern actuate = Pattern.compile("#(?<actuator>\\w+)?\\((?<pragma>.*)\\)");
         Pattern locPattern = Pattern.compile("\\{((?<arrays>.*)?)\\}");
+        Pattern greater = Pattern.compile("(?<left>[\\s\\S]+)>(?<right>[\\s\\S]+)");
+        Pattern less = Pattern.compile("(?<left>[\\s\\S]+)<(?<right>[\\s\\S]+)");
+        Pattern equals = Pattern.compile("(?<left>[\\s\\S]+)==(?<right>[\\s\\S]+)");
+        Pattern un = Pattern.compile("!(?<predicate>[\\s\\S]+)");
         Matcher matcher;
         if ((matcher = placeholder.matcher(s)).matches()) {
             return new PlaceholderSelector(matcher.group("placeholder"),manager);
@@ -258,6 +266,21 @@ public class SentenceFactory {
             } catch (Exception e) {
                 throw new ERROR("can't create arrays from " + s, e);
             }
+        } else if ((matcher=greater.matcher(s)).matches()) {
+            ISelector<?> one = getValue(matcher.group("left"));
+            ISelector<?> two = getValue(matcher.group("right"));
+            return new Greater(one,two);
+        } else if ((matcher=less.matcher(s)).matches()) {
+            ISelector<?> one = getValue(matcher.group("left"));
+            ISelector<?> two = getValue(matcher.group("right"));
+            return new Less(one,two);
+        } else if ((matcher=equals.matcher(s)).matches()) {
+            ISelector<?> one = getValue(matcher.group("left"));
+            ISelector<?> two = getValue(matcher.group("right"));
+            return new Equals(one,two);
+        } else if ((matcher = un.matcher(s)).matches()) {
+            ISelector<?> predicate = getValue(matcher.group("predicate"));
+            return new Un(predicate);
         }
         if (keywordsMap.containsKey(s)) {
             return keywordsMap.get(s);
