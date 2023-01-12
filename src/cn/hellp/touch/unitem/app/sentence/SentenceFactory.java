@@ -3,6 +3,7 @@ package cn.hellp.touch.unitem.app.sentence;
 import cn.hellp.touch.unitem.actuator.IActuator;
 import cn.hellp.touch.unitem.actuator.block.SetBlockTypeActuator;
 import cn.hellp.touch.unitem.actuator.entity.*;
+import cn.hellp.touch.unitem.actuator.itemstack.SetItemStackTypeActuator;
 import cn.hellp.touch.unitem.app.ActuatorList;
 import cn.hellp.touch.unitem.app.PlaceholderManager;
 import cn.hellp.touch.unitem.app.Sentence;
@@ -16,19 +17,23 @@ import cn.hellp.touch.unitem.selector.entity.living.NearByLivingEntitySelector;
 import cn.hellp.touch.unitem.selector.entity.living.player.CallingPlayerSelector;
 import cn.hellp.touch.unitem.selector.entity.living.player.LastDamageSourcePlayerSelector;
 import cn.hellp.touch.unitem.selector.entity.living.player.OnlinePlayerSelector;
+import cn.hellp.touch.unitem.selector.item.GetItemInHand;
 import cn.hellp.touch.unitem.selector.location.LocationOfEntitySelector;
 import cn.hellp.touch.unitem.selector.location.LocationValueSelector;
 import cn.hellp.touch.unitem.selector.tools.ActuatorSelector;
 import cn.hellp.touch.unitem.selector.tools.ArraySelector;
 import cn.hellp.touch.unitem.selector.tools.GetFromIndexSelector;
 import cn.hellp.touch.unitem.selector.tools.ToStringSelector;
+import cn.hellp.touch.unitem.selector.tools.block.GetBlockType;
 import cn.hellp.touch.unitem.selector.tools.entity.GetDirection;
 import cn.hellp.touch.unitem.selector.tools.entity.GetFoodLevelSelector;
 import cn.hellp.touch.unitem.selector.tools.entity.GetHealthSelector;
 import cn.hellp.touch.unitem.selector.tools.entity.GetVelocitySelector;
+import cn.hellp.touch.unitem.selector.tools.item.GetItemType;
 import cn.hellp.touch.unitem.selector.tools.location.*;
 import cn.hellp.touch.unitem.selector.tools.number.AddNumber;
 import cn.hellp.touch.unitem.selector.tools.number.SubNumber;
+import cn.hellp.touch.unitem.selector.tools.string.ConcatString;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
@@ -65,6 +70,8 @@ public class SentenceFactory {
         actuator=new SetFoodLevelActuator();
         actuatorMap.put(actuator.actuatorID(), actuator);
         actuator=new SetHealthActuator();
+        actuatorMap.put(actuator.actuatorID(), actuator);
+        actuator=new SetItemStackTypeActuator();
         actuatorMap.put(actuator.actuatorID(), actuator);
 
         Constructor<?> selectorConstructor;
@@ -132,6 +139,19 @@ public class SentenceFactory {
 
             selectorConstructor = GetDirection.class.getDeclaredConstructor(ISelector.class);
             selectorCreateMap.put("getDirection",listOf(selectorConstructor));
+
+            selectorConstructor = GetItemInHand.class.getDeclaredConstructor();
+            selectorConstructor1 = GetItemInHand.class.getDeclaredConstructor(ISelector.class);
+            selectorCreateMap.put("getItemInHand",listOf(selectorConstructor,selectorConstructor1));
+
+            selectorConstructor = GetBlockType.class.getDeclaredConstructor(ISelector.class);
+            selectorCreateMap.put("getBlockType",listOf(selectorConstructor));
+
+            selectorConstructor = GetItemType.class.getDeclaredConstructor(ISelector.class);
+            selectorCreateMap.put("getItemType",listOf(selectorConstructor));
+
+            selectorConstructor = ConcatString.class.getDeclaredConstructor(ISelector.class,ISelector.class);
+            selectorCreateMap.put("concatString",listOf(selectorConstructor));
         } catch (NoSuchMethodException e) {
             throw new ERROR(e);
         }
