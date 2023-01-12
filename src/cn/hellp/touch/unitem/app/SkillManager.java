@@ -17,12 +17,12 @@ public class SkillManager {
     public static Skill loadSkill(File file) {
         try {
             FileInputStream is =new FileInputStream(file);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+            SentenceReader reader = new SentenceReader(is);
             String line;
             PlaceholderManager manager = new PlaceholderManager();
             ActuatorList actuatorList = new ActuatorList();
             SentenceFactory factory = new SentenceFactory(manager,actuatorList);
-            while ((line= reader.readLine())!=null) {
+            while ((line= reader.readSentence())!=null) {
                 factory.create(line);
             }
             String name = file.getName().substring(0,file.getName().lastIndexOf("."));

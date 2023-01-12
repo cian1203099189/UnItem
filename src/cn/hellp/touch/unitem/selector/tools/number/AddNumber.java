@@ -1,8 +1,11 @@
 package cn.hellp.touch.unitem.selector.tools.number;
 
 import cn.hellp.touch.unitem.selector.ISelector;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +25,13 @@ public class AddNumber implements ISelector {
         Object[] t = two.select(invoker);
         List<Object> result = new ArrayList<>();
         for(Object o1 : o) {
+            if(o1==null) {
+                continue;
+            }
             for (Object o2 : t) {
+                if(o2==null) {
+                    continue;
+                }
                 Object added;
                 try {
                     added= Integer.valueOf(((Integer) o1).intValue()+ ((Integer) o2).intValue());
@@ -44,7 +53,23 @@ public class AddNumber implements ISelector {
                     result.add(added);
                     continue;
                 } catch (Exception ignored) {}
-                throw new RuntimeException(o1+" is not a number");
+                try {
+                    added= ((Location) o1).add(((Location) o2));
+                    result.add(added);
+                    continue;
+                } catch (Exception ignored) {}
+                try {
+                    added= ((Vector) o1).add(((Vector) o2));
+                    result.add(added);
+                    continue;
+                } catch (Exception ignored) {}
+                try {
+                    Method add = o1.getClass().getDeclaredMethod("add",o1.getClass());
+                    added=add.invoke(o1,o2);
+                    result.add(added);
+                    continue;
+                }catch (Exception ignored) {}
+                throw new RuntimeException("can't add object "+o1);
             }
         }
         return result.toArray(new Object[0]);

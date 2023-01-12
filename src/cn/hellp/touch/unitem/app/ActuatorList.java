@@ -22,6 +22,10 @@ public class ActuatorList {
         return actuatorList.remove(actuatorList.size()-1);
     }
 
+    public <A extends CallableActuator> CallableActuator[] toArray(A[] a) {
+        return actuatorList.toArray(a);
+    }
+
     public void clear() {
         actuatorList.clear();
     }

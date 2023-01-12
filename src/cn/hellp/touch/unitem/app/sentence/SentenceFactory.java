@@ -4,11 +4,10 @@ import cn.hellp.touch.unitem.actuator.IActuator;
 import cn.hellp.touch.unitem.actuator.block.SetBlockTypeActuator;
 import cn.hellp.touch.unitem.actuator.entity.*;
 import cn.hellp.touch.unitem.actuator.itemstack.SetItemStackTypeActuator;
-import cn.hellp.touch.unitem.app.ActuatorList;
-import cn.hellp.touch.unitem.app.PlaceholderManager;
-import cn.hellp.touch.unitem.app.Sentence;
+import cn.hellp.touch.unitem.app.*;
 import cn.hellp.touch.unitem.auxiliary.ERROR;
 import cn.hellp.touch.unitem.selector.ISelector;
+import cn.hellp.touch.unitem.selector.PlaceholderSelector;
 import cn.hellp.touch.unitem.selector.ValueSelector;
 import cn.hellp.touch.unitem.selector.block.GetBlockFromLocationSelector;
 import cn.hellp.touch.unitem.selector.block.LookingBlockSelector;
@@ -27,7 +26,9 @@ import cn.hellp.touch.unitem.selector.tools.entity.GetFoodLevelSelector;
 import cn.hellp.touch.unitem.selector.tools.entity.GetHealthSelector;
 import cn.hellp.touch.unitem.selector.tools.entity.GetVelocitySelector;
 import cn.hellp.touch.unitem.selector.tools.item.GetItemType;
-import cn.hellp.touch.unitem.selector.tools.location.*;
+import cn.hellp.touch.unitem.selector.tools.location.XOf;
+import cn.hellp.touch.unitem.selector.tools.location.YOf;
+import cn.hellp.touch.unitem.selector.tools.location.ZOf;
 import cn.hellp.touch.unitem.selector.tools.number.AddNumber;
 import cn.hellp.touch.unitem.selector.tools.number.SubNumber;
 import cn.hellp.touch.unitem.selector.tools.string.ConcatString;
@@ -104,12 +105,6 @@ public class SentenceFactory {
 
             selectorConstructor = LocationOfEntitySelector.class.getDeclaredConstructor(ISelector.class);
             selectorCreateMap.put("locationOfEntity", listOf(selectorConstructor));
-
-            selectorConstructor = Add.class.getDeclaredConstructor(ISelector.class, ValueSelector.class);
-            selectorCreateMap.put("addLoc", listOf(selectorConstructor));
-
-            selectorConstructor = Sub.class.getDeclaredConstructor(ISelector.class, ValueSelector.class);
-            selectorCreateMap.put("subLoc", listOf(selectorConstructor));
 
             selectorConstructor = GetFoodLevelSelector.class.getDeclaredConstructor(ISelector.class);
             selectorCreateMap.put("getFoodLevel", listOf(selectorConstructor));
@@ -248,7 +243,7 @@ public class SentenceFactory {
         Pattern locPattern = Pattern.compile("\\{((?<arrays>.*)?)\\}");
         Matcher matcher;
         if ((matcher = placeholder.matcher(s)).matches()) {
-            return manager.get(matcher.group("placeholder"));
+            return new PlaceholderSelector(matcher.group("placeholder"),manager);
         } else if ((matcher = selector.matcher(s)).matches()) {
             return newInstance(matcher.group("selectorName"), handlePragma(matcher.group("pragma")));
         } else if ((matcher = actuate.matcher(s)).matches()) {
@@ -292,6 +287,7 @@ public class SentenceFactory {
         raw = raw.trim();
         Pattern assign = Pattern.compile("\\$(?<placeholder>\\w+)?=(?<value>.+)");
         Pattern actuate = Pattern.compile("#(?<actuator>\\w+)?\\((?<pragma>.*)\\)");
+        Pattern for_ = Pattern.compile("(\\s*)?for(\\s+)(?<placeholder>\\S+?)(\\s+)in(\\s+)range(\\s*)\\((?<range>(.|\\s)*?)\\)(\\s*)\\{(?<body>([\\s\\S]*))\\}");
         Matcher matcher;
         if ((matcher = assign.matcher(raw)).matches()) {
             String name = matcher.group("placeholder");
@@ -307,7 +303,24 @@ public class SentenceFactory {
             ISelector<?>[] pragma = handlePragma(matcher.group("pragma"));
             sentence.init(actuator, pragma);
             return sentence;
+        } else if ((matcher=for_.matcher(raw)).matches()) {
+            try {
+                String placeholder = matcher.group("placeholder");
+                ISelector<?>[] range = handlePragma(matcher.group("range"));
+                PlaceholderManager manager1 = manager.clone();
+                ForActuatorSentence sentence = new ForActuatorSentence(manager1,list);
+                String[] bodies = SentenceReader.splitSentences(matcher.group("body"));
+                ActuatorList list1 = new ActuatorList();
+                SentenceFactory factory = new SentenceFactory(manager1,list1);
+                for (String body : bodies) {
+                    factory.create(body);
+                }
+                sentence.init(placeholder,manager1,range[0],range[1], list1.toArray(new CallableActuator[0]));
+                return sentence;
+            } catch (Exception e) {
+                throw new ERROR(e);
+            }
         }
-        throw new ERROR();
+        throw new ERROR("Unknown sentence "+raw);
     }
 }

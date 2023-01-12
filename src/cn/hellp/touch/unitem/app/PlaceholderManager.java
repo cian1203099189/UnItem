@@ -24,6 +24,16 @@ public class PlaceholderManager {
         return placeholderMap.get(name);
     }
 
+
+    @Override
+    public PlaceholderManager clone() {
+        PlaceholderManager placeholderManager = new PlaceholderManager();
+        for (String key : placeholderMap.keySet()) {
+            placeholderManager.placeholderMap.put(new String(key.toCharArray()), placeholderManager.get(key));
+        }
+        return placeholderManager;
+    }
+
     public void replace(String name,ISelector<?> o) {
         placeholderMap.replace(name,o);
     }
