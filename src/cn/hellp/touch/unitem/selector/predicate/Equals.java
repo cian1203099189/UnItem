@@ -33,38 +33,8 @@ public class Equals implements ISelector<Boolean> {
                 result.add(false);
                 continue;
             }
-            Boolean added;
-            try {
-                added = ((Integer) o1).intValue() == ((Integer) o2).intValue();
-                result.add(added);
-                continue;
-            } catch (Exception ignored) {
-            }
-            try {
-                added = ((Double) o1).doubleValue() == ((Double) o2).doubleValue();
-                result.add(added);
-                continue;
-            } catch (Exception ignored) {
-            }
-            try {
-                added = ((Long) o1).longValue() == ((Long) o2).longValue();
-                result.add(added);
-                continue;
-            } catch (Exception ignored) {
-            }
-            try {
-                added = ((Float) o1).floatValue() == ((Float) o2).floatValue();
-                result.add(added);
-                continue;
-            } catch (Exception ignored) {
-            }
-            try {
-                added = ((Short) o1 > (Short) o2);
-                result.add(added);
-                continue;
-            } catch (Exception ignored) {
-            }
-            throw new ERROR("can't use the operator > between " + o1.getClass() + " and " + o2.getClass());
+            Boolean added = o1.equals(o2);
+            result.add(added);
         }
         return result.toArray(new Boolean[0]);
     }

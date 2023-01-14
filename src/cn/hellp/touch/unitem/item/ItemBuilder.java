@@ -83,7 +83,11 @@ public class ItemBuilder {
                 im.addItemFlags(itemFlag);
             }
         }
-        im.spigot().setUnbreakable(true);
+        if(NbtTool.server_version>=12) {
+            im.setUnbreakable(true);
+        } else {
+            im.spigot().setUnbreakable(true);
+        }
         itemStack.setItemMeta(im);
         if(nbtValue!=null && !nbtValue.isEmpty()) {
             itemStack= NbtTool.setString(itemStack,Main.nbtPrefix,nbtValue);

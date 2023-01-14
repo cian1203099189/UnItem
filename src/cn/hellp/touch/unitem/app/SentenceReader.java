@@ -20,24 +20,35 @@ public class SentenceReader extends Reader {
         int i = 0;
         StringBuilder builder = new StringBuilder();
         char[] cArray = new char[1];
+        boolean inString = false;
         while (reader.read(cArray)>0) {
             char c=cArray[0];
-            if('{'==c) {
-                i++;
-                builder.append(c);
-            } else if ('}'==c) {
-                i--;
-                builder.append(c);
-                if(i==0) {
-                    return builder.toString();
+            if (!inString) {
+                if ('{' == c) {
+                    i++;
+                    builder.append(c);
+                } else if ('}' == c) {
+                    i--;
+                    builder.append(c);
+                    if (i == 0) {
+                        return (builder.toString());
+                    }
+                } else if (';' == c && i == 0) {
+                    return (builder.toString());
+                } else if ('\"' == c|| '\'' == c) {
+                    inString= true;
+                    builder.append(c);
+                } else {
+                    builder.append(c);
                 }
-            } else if (';' == c && i == 0) {
-                return builder.toString();
-            } else {
+            } else if ('\"' == c|| '\'' == c) {
+                inString= false;
+                builder.append(c);
+            } else{
                 builder.append(c);
             }
         }
-        return null;
+        return builder.toString();
     }
 
     public static String[] splitSentences(String s) {
@@ -45,24 +56,43 @@ public class SentenceReader extends Reader {
         char[] raw = s.toCharArray();
         int point=0;
         int i = 0;
+        boolean inString = false;
         List<String> result = new ArrayList<>();
         while (point< raw.length) {
             char c=raw[point];
-            if('{'==c) {
-                i++;
-                builder.append(c);
-            } else if ('}'==c) {
-                i--;
-                if(i==0) {
+            if (!inString) {
+                if ('{' == c) {
+                    i++;
+                    builder.append(c);
+                } else if ('}' == c) {
+                    i--;
+                    builder.append(c);
+                    if (i == 0) {
+                        result.add(builder.toString());
+                        builder.delete(0,builder.length()-1);
+                    }
+                } else if (';' == c && i == 0) {
                     result.add(builder.toString());
+                    builder.delete(0,builder.length()-1);
+                } else if ('\"' == c || '\'' == c) {
+                    inString= true;
+                    builder.append(c);
+                } else {
+                    builder.append(c);
                 }
+            } else if ('\"' == c || '\'' == c) {
+                inString= false;
                 builder.append(c);
-            } else if (';' == c && i == 0) {
-                result.add(builder.toString());
-            } else {
+            } else{
                 builder.append(c);
             }
             point++;
+        }
+        {
+            String s0;
+            if (!(s0=builder.toString()).isEmpty()) {
+                result.add(s0);
+            }
         }
         return result.toArray(new String[0]);
     }

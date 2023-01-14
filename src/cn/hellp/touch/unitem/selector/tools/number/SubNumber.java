@@ -2,7 +2,9 @@ package cn.hellp.touch.unitem.selector.tools.number;
 
 import cn.hellp.touch.unitem.auxiliary.ERROR;
 import cn.hellp.touch.unitem.selector.ISelector;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +14,8 @@ public class SubNumber implements ISelector {
     private final ISelector<?> two;
 
     public SubNumber(ISelector<?> one, ISelector<?> two) {
-        this.one=one;
-        this.two=two;
+        this.one = one;
+        this.two = two;
     }
 
 
@@ -21,32 +23,56 @@ public class SubNumber implements ISelector {
     public Object[] select(Player invoker) {
         Object[] o = one.select(invoker);
         Object[] t = two.select(invoker);
+        final int length = Math.min(o.length, t.length);
         List<Object> result = new ArrayList<>();
-        for(Object o1 : o) {
-            for (Object o2 : t) {
-                Object added;
-                try {
-                    added= Integer.valueOf(((Integer) o1).intValue()- ((Integer) o2).intValue());
-                    result.add(added);
-                    continue;
-                } catch (Exception ignored) {}
-                try {
-                    added= Double.valueOf(((Double) o1).doubleValue()- ((Double) o2).doubleValue());
-                    result.add(added);
-                    continue;
-                } catch (Exception ignored) {}
-                try {
-                    added= Long.valueOf(((Long) o1).longValue()- ((Long) o2).longValue());
-                    result.add(added);
-                    continue;
-                } catch (Exception ignored) {}
-                try {
-                    added= Float.valueOf(((Float) o1).floatValue()- ((Float) o2).floatValue());
-                    result.add(added);
-                    continue;
-                } catch (Exception ignored) {}
-                throw new ERROR(o1+" is not a number");
+        for (int i = 0; i < length; i++) {
+            Object o1 = o[i];
+            if (o1 == null) {
+                continue;
             }
+            Object o2 = t[i];
+            if (o2 == null) {
+                continue;
+            }
+            Object added;
+            try {
+                added = Integer.valueOf(((Integer) o1).intValue() - ((Integer) o2).intValue());
+                result.add(added);
+                continue;
+            } catch (Exception ignored) {
+            }
+            try {
+                added = Double.valueOf(((Double) o1).doubleValue() - ((Double) o2).doubleValue());
+                result.add(added);
+                continue;
+            } catch (Exception ignored) {
+            }
+            try {
+                added = Long.valueOf(((Long) o1).longValue() - ((Long) o2).longValue());
+                result.add(added);
+                continue;
+            } catch (Exception ignored) {
+            }
+            try {
+                added = Float.valueOf(((Float) o1).floatValue() - ((Float) o2).floatValue());
+                result.add(added);
+                continue;
+            } catch (Exception ignored) {
+            }
+            try {
+                ((Location) o2).setWorld(((Location) o1).getWorld());
+                added = ((Location) o1).subtract(((Location) o2));
+                result.add(added);
+                continue;
+            } catch (Exception ignored) {
+            }
+            try {
+                added = ((Vector) o1).subtract(((Vector) o2));
+                result.add(added);
+                continue;
+            } catch (Exception ignored) {
+            }
+            throw new ERROR(o1 + " can't be sub.");
         }
         return result.toArray(new Object[0]);
     }

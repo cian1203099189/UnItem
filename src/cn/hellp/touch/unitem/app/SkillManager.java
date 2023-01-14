@@ -22,7 +22,7 @@ public class SkillManager {
             PlaceholderManager manager = new PlaceholderManager();
             ActuatorList actuatorList = new ActuatorList();
             SentenceFactory factory = new SentenceFactory(manager,actuatorList);
-            while ((line= reader.readSentence())!=null) {
+            while ((line= reader.readSentence())!=null && !line.isEmpty()) {
                 factory.create(line);
             }
             String name = file.getName().substring(0,file.getName().lastIndexOf("."));
