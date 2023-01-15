@@ -25,6 +25,7 @@ public class SkillManager {
             while ((line= reader.readSentence())!=null && !line.isEmpty()) {
                 factory.create(line);
             }
+            factory.cleanUp();
             String name = file.getName().substring(0,file.getName().lastIndexOf("."));
             Skill skill = new Skill(actuatorList, name);
             skillMap.put(name,skill);

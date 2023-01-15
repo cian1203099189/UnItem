@@ -3,19 +3,17 @@ package cn.hellp.touch.unitem.selector.tools.number;
 import cn.hellp.touch.unitem.auxiliary.ERROR;
 import cn.hellp.touch.unitem.auxiliary.Number;
 import cn.hellp.touch.unitem.selector.ISelector;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddNumber implements ISelector {
+public class DividedNumber implements ISelector {
     private final ISelector<?> one;
     private final ISelector<?> two;
 
-    public AddNumber(ISelector<?> one, ISelector<?> two) {
+    public DividedNumber(ISelector<?> one, ISelector<?> two) {
         this.one = one;
         this.two = two;
     }
@@ -38,51 +36,24 @@ public class AddNumber implements ISelector {
             }
             Object added;
             try {
-                added = ((Number) o1).add(((Number) o2));
+                added = ((Number) o1).divide(((Number) o2));
                 result.add(added);
                 continue;
             } catch (Exception ignored) {
             }
             try {
-                ((Location) o2).setWorld(((Location) o1).getWorld());
-                added = ((Location) o1).add(((Location) o2));
+                added = ((Vector) o1).divide(((Vector) o2));
                 result.add(added);
                 continue;
             } catch (Exception ignored) {
             }
-            try {
-                added = ((Vector) o1).add(((Vector) o2));
-                result.add(added);
-                continue;
-            } catch (Exception ignored) {
-            }
-            try {
-                added = ((String) o1)+(o2);
-                result.add(added);
-                continue;
-            } catch (Exception ignored) {
-            }
-            try {
-                added = (o1)+((String)o2);
-                result.add(added);
-                continue;
-            } catch (Exception ignored) {
-            }
-            try {
-                Method add = o1.getClass().getDeclaredMethod("add", o1.getClass());
-                added = add.invoke(o1, o2);
-                result.add(added);
-                continue;
-            } catch (Exception ignored) {
-            }
-            throw new ERROR("can't add object " + o1 + " and "+o2);
+            throw new ERROR(o1 + " can't be divided.");
         }
         return result.toArray(new Object[0]);
     }
 
     @Override
     public String selectorID() {
-        return "add";
+        return "divided";
     }
-
 }

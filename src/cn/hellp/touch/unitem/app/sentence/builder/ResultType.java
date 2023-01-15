@@ -11,18 +11,18 @@ public enum ResultType {
     REMATCH;
 
     public Result withCallableActuator(@Nonnull CallableActuator actuator) {
-        return new Result(DONE,actuator);
+        return new Result(this,actuator);
     }
 
     public Result withCallableActuatorAndNeedNext(@Nonnull CallableActuator actuator, @Nonnull Pattern need) {
-        return new Result(DONE,actuator,need);
+        return new Result(this,actuator,need);
     }
 
     public Result withNeedNext(@Nonnull Pattern need) {
-        return new Result(DONE,null,need);
+        return new Result(this,null,need);
     }
 
     public Result empty() {
-        return new Result(DONE,null);
+        return new Result(this,null);
     }
 }

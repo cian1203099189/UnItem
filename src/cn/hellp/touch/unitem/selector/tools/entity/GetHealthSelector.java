@@ -1,10 +1,11 @@
 package cn.hellp.touch.unitem.selector.tools.entity;
 
 import cn.hellp.touch.unitem.selector.ISelector;
+import cn.hellp.touch.unitem.auxiliary.Number;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Player;
 
-public class GetHealthSelector implements ISelector<Double> {
+public class GetHealthSelector implements ISelector<Number> {
     private final ISelector<?> entities;
 
     public GetHealthSelector(ISelector<?> entities) {
@@ -12,12 +13,12 @@ public class GetHealthSelector implements ISelector<Double> {
     }
 
     @Override
-    public Double[] select(Player invoker) {
+    public Number[] select(Player invoker) {
         Object[] entities = this.entities.select(invoker);
-        Double[] result = new Double[entities.length];
+        Number[] result = new Number[entities.length];
         for (int i = 0;i<entities.length;i++) {
             Damageable damageable=(Damageable)entities[i];
-            result[i]=damageable.getHealth();
+            result[i]= new Number(damageable.getHealth());
         }
         return result;
     }

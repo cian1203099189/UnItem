@@ -16,6 +16,44 @@ public class SentenceReader extends Reader {
     }
 
 
+    public static String extractTextInBracket(String text) {
+        int i = -1;
+        boolean inString = false;
+        StringBuilder builder = new StringBuilder();
+        int pointer = 0;
+        char[] cArray = text.toCharArray();
+        final int length = cArray.length;
+        while (pointer<length) {
+                char c = cArray[pointer];
+                if (!inString) {
+                    if ('(' == c) {
+                        if (i > 0) {
+                            builder.append(c);
+                        }
+                        i++;
+                    } else if (')' == c) {
+                        if (i == 0) {
+                            return builder.toString();
+                        }
+                        if(i > 0) {
+                            builder.append(c);
+                        }
+                        i--;
+                    } else if ('\"' == c && i>=0) {
+                        builder.append(c);
+                        inString=true;
+                    }
+                } else if ('\"'==c && i>=0) {
+                    inString=false;
+                } else {
+                    builder.append(c);
+                }
+            pointer++;
+        }
+        return builder.toString();
+    }
+
+
     public String readSentence() throws IOException {
         int i = 0;
         StringBuilder builder = new StringBuilder();
@@ -69,11 +107,11 @@ public class SentenceReader extends Reader {
                     builder.append(c);
                     if (i == 0) {
                         result.add(builder.toString());
-                        builder.delete(0,builder.length()-1);
+                        builder.delete(0,builder.length());
                     }
                 } else if (';' == c && i == 0) {
                     result.add(builder.toString());
-                    builder.delete(0,builder.length()-1);
+                    builder.delete(0,builder.length());
                 } else if ('\"' == c || '\'' == c) {
                     inString= true;
                     builder.append(c);

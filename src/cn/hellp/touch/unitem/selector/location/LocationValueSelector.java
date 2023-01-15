@@ -2,6 +2,7 @@ package cn.hellp.touch.unitem.selector.location;
 
 import cn.hellp.touch.unitem.selector.ISelector;
 import cn.hellp.touch.unitem.selector.ValueSelector;
+import cn.hellp.touch.unitem.auxiliary.Number;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -45,11 +46,7 @@ public class LocationValueSelector extends ValueSelector<Location> {
         for (Object x : x.select(invoker)) {
             for (Object y : y.select(invoker)) {
                 for (Object z : z.select(invoker)) {
-                    try {
-                        result.add(new Location(world2, (Double) x, (Double) y, (Double) z));
-                    } catch (ClassCastException exception) {
-                        result.add(new Location(world2, (Integer) x, (Integer) y, (Integer) z));
-                    }
+                    result.add(new Location(world2, ((Number) x).toDouble(), ((Number) y).toDouble(), ((Number) z).toDouble()));
                 }
             }
         }

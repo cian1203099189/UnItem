@@ -7,6 +7,7 @@ import cn.hellp.touch.unitem.app.PlaceholderManager;
 import cn.hellp.touch.unitem.auxiliary.ERROR;
 import cn.hellp.touch.unitem.selector.ISelector;
 
+import javax.annotation.Nullable;
 import java.util.regex.Pattern;
 
 import static cn.hellp.touch.unitem.app.sentence.SentenceFactory.actuatorMap;
@@ -18,7 +19,7 @@ public class ActuateBuilder extends SentenceBuilder{
     }
 
     @Override
-    public Result create(String raw, PlaceholderManager placeholderManager, ActuatorList actuatorList) {
+    public Result create(String raw, PlaceholderManager placeholderManager, ActuatorList actuatorList, @Nullable SentenceBuilder lastSentence) {
         IActuator actuator = actuatorMap.get(matcher.group("actuator"));
         if (actuator == null) {
             throw new ERROR("Unknown actuator " + matcher.group("actuator"));

@@ -1,6 +1,7 @@
 package cn.hellp.touch.unitem.selector.tools.number;
 
 import cn.hellp.touch.unitem.auxiliary.ERROR;
+import cn.hellp.touch.unitem.auxiliary.Number;
 import cn.hellp.touch.unitem.selector.ISelector;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -36,25 +37,7 @@ public class SubNumber implements ISelector {
             }
             Object added;
             try {
-                added = Integer.valueOf(((Integer) o1).intValue() - ((Integer) o2).intValue());
-                result.add(added);
-                continue;
-            } catch (Exception ignored) {
-            }
-            try {
-                added = Double.valueOf(((Double) o1).doubleValue() - ((Double) o2).doubleValue());
-                result.add(added);
-                continue;
-            } catch (Exception ignored) {
-            }
-            try {
-                added = Long.valueOf(((Long) o1).longValue() - ((Long) o2).longValue());
-                result.add(added);
-                continue;
-            } catch (Exception ignored) {
-            }
-            try {
-                added = Float.valueOf(((Float) o1).floatValue() - ((Float) o2).floatValue());
+                added = ((Number) o1).sub(((Number) o2));
                 result.add(added);
                 continue;
             } catch (Exception ignored) {

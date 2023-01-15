@@ -4,9 +4,12 @@ import cn.hellp.touch.unitem.actuator.IActuator;
 import cn.hellp.touch.unitem.actuator.block.SetBlockTypeActuator;
 import cn.hellp.touch.unitem.actuator.entity.*;
 import cn.hellp.touch.unitem.actuator.itemstack.SetItemStackTypeActuator;
-import cn.hellp.touch.unitem.app.*;
+import cn.hellp.touch.unitem.app.ActuatorList;
+import cn.hellp.touch.unitem.app.PlaceholderManager;
+import cn.hellp.touch.unitem.app.SentenceReader;
 import cn.hellp.touch.unitem.app.sentence.builder.*;
 import cn.hellp.touch.unitem.auxiliary.ERROR;
+import cn.hellp.touch.unitem.auxiliary.Number;
 import cn.hellp.touch.unitem.auxiliary.Pair;
 import cn.hellp.touch.unitem.selector.ISelector;
 import cn.hellp.touch.unitem.selector.PlaceholderSelector;
@@ -38,10 +41,11 @@ import cn.hellp.touch.unitem.selector.tools.location.XOf;
 import cn.hellp.touch.unitem.selector.tools.location.YOf;
 import cn.hellp.touch.unitem.selector.tools.location.ZOf;
 import cn.hellp.touch.unitem.selector.tools.number.AddNumber;
+import cn.hellp.touch.unitem.selector.tools.number.DividedNumber;
+import cn.hellp.touch.unitem.selector.tools.number.MulNumber;
 import cn.hellp.touch.unitem.selector.tools.number.SubNumber;
 import cn.hellp.touch.unitem.selector.tools.player.PlayerNameSelector;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -156,8 +160,12 @@ public class SentenceFactory {
         }
     }
 
+    public final List<SentenceBuilder> builderList = new ArrayList<>();
     private final PlaceholderManager manager;
     private final ActuatorList list;
+    private final Stack<Pair<SentenceBuilder, Result>> builderStack = new Stack<>();
+    private SentenceBuilder last = null;
+
     public SentenceFactory(PlaceholderManager manager, ActuatorList list) {
         this.manager = manager;
         this.list = list;
@@ -200,11 +208,11 @@ public class SentenceFactory {
                 } else if ('}' == c) {
                     --b;
                 } else if ('\"' == c || '\'' == c) {
-                    inString=true;
-                    strChar=c;
+                    inString = true;
+                    strChar = c;
                 }
             } else if (strChar == c) {
-                inString=false;
+                inString = false;
             }
             if (i < 0 || b < 0) {
                 throw new ERROR("wrong config of line " + s);
@@ -237,29 +245,17 @@ public class SentenceFactory {
         if ((matcher = string.matcher(s)).matches() || (matcher = string1.matcher(s)).matches()) {
             return new ValueSelector<>(matcher.group("value"));
         }
-        try {
-            return new ValueSelector<>(Integer.parseInt(s));
-        } catch (Exception ignored) {
-        }
-        try {
-            return new ValueSelector<>(Double.parseDouble(s));
-        } catch (Exception ignored) {
-        }
-        try {
-            return new ValueSelector<>(Float.parseFloat(s));
-        } catch (Exception ignored) {
-        }
-        try {
-            return new ValueSelector<>(Long.parseLong(s));
-        } catch (Exception ignored) {
-        }
         if (s.equalsIgnoreCase("true") || s.equalsIgnoreCase("false")) {
             return new ValueSelector<>(Boolean.parseBoolean(s));
+        }
+        try {
+            return new ValueSelector<>(new Number(s));
+        } catch (Exception ignored) {
         }
         return new ValueSelector<>(s);
     }
 
-    public static ISelector<?> getValue(String s,PlaceholderManager manager) {
+    public static ISelector<?> getValue(String s, PlaceholderManager manager) {
         s = s.trim();
         Pattern pattern = Pattern.compile("\\((?<body>.*)\\)");
         Matcher matcher;
@@ -273,10 +269,11 @@ public class SentenceFactory {
         }
         Pattern placeholder = Pattern.compile("\\$(?<placeholder>(\\w)*)");
         Pattern selector = Pattern.compile("(?<selectorName>\\w*?)\\((?<pragma>.*)\\)");
-        Pattern actuate = Pattern.compile("#(?<actuator>\\w+?)\\((?<pragma>.*)\\)");
         Pattern locPattern = Pattern.compile("\\{(?<arrays>.*?)}");
         Pattern add = Pattern.compile("(?<left>[\\s\\S]+?)\\+(?<right>[\\s\\S]+)");
         Pattern sub = Pattern.compile("(?<left>[\\s\\S]+?)-(?<right>[\\s\\S]+)");
+        Pattern mul = Pattern.compile("(?<left>[\\s\\S]+?)\\+(?<right>[\\s\\S]+)");
+        Pattern divided = Pattern.compile("(?<left>[\\s\\S]+?)\\+(?<right>[\\s\\S]+)");
         Pattern greater = Pattern.compile("(?<left>[\\s\\S]+?)>(?<right>[\\s\\S]+)");
         Pattern less = Pattern.compile("(?<left>[\\s\\S]+?)<(?<right>[\\s\\S]+)");
         Pattern equals = Pattern.compile("(?<left>[\\s\\S]+?)==(?<right>[\\s\\S]+)");
@@ -286,74 +283,79 @@ public class SentenceFactory {
         Pattern greater_equals = Pattern.compile("(?<left>[\\s\\S]+?)>=(?<right>[\\s\\S]+)");
         Pattern less_equals = Pattern.compile("(?<left>[\\s\\S]+?)<=(?<right>[\\s\\S]+)");
         Pattern un_equals = Pattern.compile("(?<left>[\\s\\S]+?)!=(?<right>[\\s\\S]+)");
-        if ((matcher = placeholder.matcher(s)).matches()) {
-            return new PlaceholderSelector(matcher.group("placeholder"), manager);
-        } else if ((matcher = selector.matcher(s)).matches()) {
-            return newInstance(matcher.group("selectorName"), handlePragma(matcher.group("pragma"),manager));
-        } else if ((matcher = actuate.matcher(s)).matches()) {
-            IActuator actuator = actuatorMap.get(matcher.group("actuator"));
-            if (actuator != null) {
-                return new ActuatorSelector(actuator, handlePragma(matcher.group("pragma"),manager));
-            }
-        } else if ((matcher = locPattern.matcher(s)).matches()) {
+        if ((matcher = locPattern.matcher(s)).matches()) {
             try {
-                ISelector<?>[] arr = handlePragma(matcher.group("arrays"),manager);
-                return new ArraySelector<>(arr);
+                ISelector<?>[] arr = handlePragma(matcher.group("arrays"), manager);
+                return new ArraySelector(arr);
             } catch (Exception e) {
                 throw new ERROR("can't create arrays from " + s, e);
             }
         } else if ((matcher = greater.matcher(s)).matches()) {
-            ISelector<?> one = getValue(matcher.group("left"),manager);
-            ISelector<?> two = getValue(matcher.group("right"),manager);
+            ISelector<?> one = getValue(matcher.group("left"), manager);
+            ISelector<?> two = getValue(matcher.group("right"), manager);
             return new Greater(one, two);
         } else if ((matcher = less.matcher(s)).matches()) {
-            ISelector<?> one = getValue(matcher.group("left"),manager);
-            ISelector<?> two = getValue(matcher.group("right"),manager);
+            ISelector<?> one = getValue(matcher.group("left"), manager);
+            ISelector<?> two = getValue(matcher.group("right"), manager);
             return new Less(one, two);
         } else if ((matcher = equals.matcher(s)).matches()) {
-            ISelector<?> one = getValue(matcher.group("left"),manager);
-            ISelector<?> two = getValue(matcher.group("right"),manager);
+            ISelector<?> one = getValue(matcher.group("left"), manager);
+            ISelector<?> two = getValue(matcher.group("right"), manager);
             return new Equals(one, two);
         } else if ((matcher = and.matcher(s)).matches()) {
-            ISelector<?> one = getValue(matcher.group("left"),manager);
-            ISelector<?> two = getValue(matcher.group("right"),manager);
+            ISelector<?> one = getValue(matcher.group("left"), manager);
+            ISelector<?> two = getValue(matcher.group("right"), manager);
             return new And(one, two);
         } else if ((matcher = or.matcher(s)).matches()) {
-            ISelector<?> one = getValue(matcher.group("left"),manager);
-            ISelector<?> two = getValue(matcher.group("right"),manager);
+            ISelector<?> one = getValue(matcher.group("left"), manager);
+            ISelector<?> two = getValue(matcher.group("right"), manager);
             return new Or(one, two);
         } else if ((matcher = greater_equals.matcher(s)).matches()) {
-            ISelector<?> one = getValue(matcher.group("left"),manager);
-            ISelector<?> two = getValue(matcher.group("right"),manager);
+            ISelector<?> one = getValue(matcher.group("left"), manager);
+            ISelector<?> two = getValue(matcher.group("right"), manager);
             return new Or(new Greater(one, two), new Equals(one, two));
         } else if ((matcher = less_equals.matcher(s)).matches()) {
-            ISelector<?> one = getValue(matcher.group("left"),manager);
-            ISelector<?> two = getValue(matcher.group("right"),manager);
+            ISelector<?> one = getValue(matcher.group("left"), manager);
+            ISelector<?> two = getValue(matcher.group("right"), manager);
             return new Or(new Less(one, two), new Equals(one, two));
         } else if ((matcher = un_equals.matcher(s)).matches()) {
-            ISelector<?> one = getValue(matcher.group("left"),manager);
-            ISelector<?> two = getValue(matcher.group("right"),manager);
+            ISelector<?> one = getValue(matcher.group("left"), manager);
+            ISelector<?> two = getValue(matcher.group("right"), manager);
             return new Un(new Equals(one, two));
         } else if ((matcher = add.matcher(s)).matches()) {
-            ISelector<?> one = getValue(matcher.group("left"),manager);
-            ISelector<?> two = getValue(matcher.group("right"),manager);
+            ISelector<?> one = getValue(matcher.group("left"), manager);
+            ISelector<?> two = getValue(matcher.group("right"), manager);
             return new AddNumber(one, two);
         } else if ((matcher = sub.matcher(s)).matches()) {
-            ISelector<?> one = getValue(matcher.group("left"),manager);
-            ISelector<?> two = getValue(matcher.group("right"),manager);
+            ISelector<?> one = getValue(matcher.group("left"), manager);
+            ISelector<?> two = getValue(matcher.group("right"), manager);
             return new SubNumber(one, two);
+        }else if ((matcher = mul.matcher(s)).matches()) {
+            ISelector<?> one = getValue(matcher.group("left"), manager);
+            ISelector<?> two = getValue(matcher.group("right"), manager);
+            return new MulNumber(one, two);
+        } else if ((matcher = divided.matcher(s)).matches()) {
+            ISelector<?> one = getValue(matcher.group("left"), manager);
+            ISelector<?> two = getValue(matcher.group("right"), manager);
+            return new DividedNumber(one, two);
         } else if ((matcher = un.matcher(s)).matches()) {
-            ISelector<?> predicate = getValue(matcher.group("predicate"),manager);
+            ISelector<?> predicate = getValue(matcher.group("predicate"), manager);
             return new Un(predicate);
-        }
-        if (keywordsMap.containsKey(s)) {
+        } else if ((matcher = selector.matcher(s)).matches()) {
+            return newInstance(matcher.group("selectorName"), handlePragma(matcher.group("pragma"), manager));
+        } else if ((matcher = placeholder.matcher(s)).matches()) {
+            if(!manager.contains(matcher.group("placeholder"))) {
+                throw new ERROR("\""+matcher.group("placeholder")+"\" var not found");
+            }
+            return new PlaceholderSelector(matcher.group("placeholder"), manager);
+        } else if (keywordsMap.containsKey(s)) {
             return keywordsMap.get(s);
         } else {
             return getLiteral(s);
         }
     }
 
-    public static ISelector<?>[] handlePragma(String pragma,PlaceholderManager manager) {
+    public static ISelector<?>[] handlePragma(String pragma, PlaceholderManager manager) {
         pragma = pragma.trim();
         if (pragma.isEmpty()) {
             return new ISelector<?>[0];
@@ -362,52 +364,9 @@ public class SentenceFactory {
         ISelector<?>[] result = new ISelector<?>[raw.length];
         for (int i = 0; i < raw.length; i++) {
             String s = raw[i];
-            result[i] = getValue(s,manager);
+            result[i] = getValue(s, manager);
         }
         return result;
-    }
-
-    public final List<SentenceBuilder> builderList = new ArrayList<>();
-    private final Stack<Pair<SentenceBuilder,Result>> builderStack = new Stack<>();
-
-    public void create(String s) {
-        s=s.trim();
-        if(s.isEmpty()) {
-            return;
-        }
-        for (SentenceBuilder builder : builderList) {
-            if(builder.matches(s)) {
-                if(!builderStack.empty()) {
-                    Pair<SentenceBuilder,Result> last = builderStack.pop();
-                    Result result;
-                    if(last.getSecond().hasNeed()) {
-                        if((last.getSecond().need.matcher(s)).matches()) {
-                           result = last.getFirst().callback(CallbackReason.COMPLETE,s,manager);
-                        } else {
-                            result = last.getFirst().callback(CallbackReason.UNMATCHED,s,manager);
-                        }
-                    } else {
-                        result=last.getFirst().callback(CallbackReason.VOID,s,manager);
-                    }
-                    if(result.hasActuator()){
-                        list.push_back(result.actuator);
-                    }
-                    if(result.type!= ResultType.REMATCH) {
-                        return;
-                    }
-                }
-                Result result = builder.create(s,manager,list);
-                if(result.hasActuator()) {
-                    list.push_back(result.actuator);
-                }
-                if(result.type == ResultType.UNDONE) {
-                    builderStack.push(new Pair<>(builder,result));
-                } else if (result.type == ResultType.REMATCH) {
-                    continue;
-                }
-                break;
-            }
-        }
     }
 
 
@@ -485,13 +444,64 @@ public class SentenceFactory {
         throw new ERROR("Unknown sentence " + raw);
     }*/
 
-    public static ActuatorList splitAndCreateSentences(PlaceholderManager manager,String raw) {
+    public static ActuatorList splitAndCreateSentences(PlaceholderManager manager, String raw) {
         String[] bodies = SentenceReader.splitSentences(raw);
         ActuatorList list1 = new ActuatorList();
         SentenceFactory factory = new SentenceFactory(manager, list1);
         for (String body : bodies) {
             factory.create(body);
         }
+        factory.cleanUp();
         return list1;
+    }
+
+    public void create(String s) {
+        s = s.trim();
+        if (s.isEmpty()) {
+            return;
+        }
+        for (SentenceBuilder builder : builderList) {
+            if (builder.matches(s)) {
+                if (!builderStack.empty()) {
+                    Pair<SentenceBuilder, Result> last = builderStack.pop();
+                    Result result;
+                    if (last.getSecond().hasNeed()) {
+                        if ((last.getSecond().need.matcher(s)).matches()) {
+                            result = last.getFirst().callback(CallbackReason.COMPLETE, s, manager);
+                        } else {
+                            result = last.getFirst().callback(CallbackReason.UNMATCHED, s, manager);
+                        }
+                    } else {
+                        result = last.getFirst().callback(CallbackReason.VOID, s, manager);
+                    }
+                    this.last = last.getFirst();
+                    if (result.hasActuator()) {
+                        list.push_back(result.actuator);
+                    }
+                    if (result.type == ResultType.REMATCH) {
+                        create(s);
+                    }
+                    return;
+                }
+                Result result = builder.create(s, manager, list, last);
+                last = builder;
+                if (result.hasActuator()) {
+                    list.push_back(result.actuator);
+                }
+                if (result.type == ResultType.UNDONE) {
+                    builderStack.push(new Pair<>(builder, result));
+                } else if (result.type == ResultType.REMATCH) {
+                    continue;
+                }
+                return;
+            }
+        }
+        throw new ERROR("can't phase sentence " + s);
+    }
+
+    public void cleanUp() {
+        builderStack.forEach(sentenceBuilderResultPair -> {
+            sentenceBuilderResultPair.getFirst().callback(CallbackReason.UNMATCHED, "", manager);
+        });
     }
 }

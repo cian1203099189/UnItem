@@ -20,42 +20,25 @@ public class CallableActuator {
         Collections.addAll(pragmas, selectors);
     }
 
-    public static List<List> a(List<List> p,Object[][] temp,int i) {
-        if(i>=temp.length) {
-            return p;
-        }
-        ArrayList<List> re = new ArrayList<>();
-        for(List<Object> o : p) {
-            for(int j = 0;j<temp[i].length;j++) {
-                ArrayList list = new ArrayList();
-                list.addAll(o);
-                list.add(temp[i][j]);
-                re.add(list);
-            }
-        }
-        return a(re,temp,++i);
-    }
-
-    public Object[] call(Player caller) {
+    public void call(Player caller) {
         Object[][] temp = new Object[pragmas.size()][];
-        List result = new ArrayList();
-        int size = -1;
-        for (int i = 0;i< pragmas.size();i++) {
-            ISelector<?> selector = pragmas.get(i);
-            Object[] objs = selector.select(caller);
-            temp[i]= objs;
-            size=Math.max(size,objs.length);
-            if(objs.length<=0) {
-                return new Object[0];
+        int length = Integer.MAX_VALUE;
+        for (int i = 0; i < pragmas.size(); i++) {
+            temp[i]=pragmas.get(i).select(caller);
+            length=Math.min(length,temp[i].length);
+        }
+        Object[] pragma = new Object[pragmas.size()];
+        for (int i = 0; i < length; i++) {
+            for (int j = 0; j < pragmas.size(); j++) {
+                pragma[j]=temp[j][i];
+            }
+            try {
+                actuator.actuate(pragma);
+            } catch (Exception e) {
+                Main.getMainLogger().warning("can't use actuator \""+actuator.actuatorID()+"\" with ");
+                e.printStackTrace();
             }
         }
-        List<List> l = new ArrayList();
-        l.add(new ArrayList());
-        List<List> a = a(l,temp,0);
-        for (List pragma : a) {
-            result.add(actuator.actuate(pragma.toArray()));
-        }
-        return result.toArray(new Object[0]);
     }
 
 

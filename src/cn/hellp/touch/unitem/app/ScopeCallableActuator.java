@@ -15,11 +15,10 @@ public class ScopeCallableActuator extends CallableActuator{
     }
 
     @Override
-    public Object[] call(Player caller) {
+    public void call(Player caller) {
         for (CallableActuator callableActuator : actuators) {
             callableActuator.call(caller);
         }
-        return new Object[0];
     }
 
     public List<CallableActuator> getActuators() {

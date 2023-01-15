@@ -2,6 +2,7 @@ package cn.hellp.touch.unitem.selector.tools;
 
 import cn.hellp.touch.unitem.selector.ISelector;
 import cn.hellp.touch.unitem.selector.ValueSelector;
+import cn.hellp.touch.unitem.auxiliary.Number;
 import org.bukkit.entity.Player;
 
 public class GetFromIndexSelector<t> extends ValueSelector<t> {
@@ -18,7 +19,7 @@ public class GetFromIndexSelector<t> extends ValueSelector<t> {
     @Override
     public t[] select(Player invoker) {
         t[] ts = (t[]) selector.select(invoker);
-        return (t[]) new Object[] {ts[(Integer) index.select(invoker)[0]]};
+        return (t[]) new Object[] {ts[((Number) index.select(invoker)[0]).toInteger()]};
     }
 
     @Override

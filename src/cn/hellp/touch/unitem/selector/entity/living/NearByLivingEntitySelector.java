@@ -1,15 +1,14 @@
 package cn.hellp.touch.unitem.selector.entity.living;
 
 import cn.hellp.touch.unitem.selector.ISelector;
+import cn.hellp.touch.unitem.auxiliary.Number;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class NearByLivingEntitySelector implements ILivingEntitySelector<LivingEntity>{
     private final ISelector<?> radius;
@@ -38,7 +37,7 @@ public class NearByLivingEntitySelector implements ILivingEntitySelector<LivingE
         Object[] ints =  radius.select(invoker);
         List<LivingEntity> result = new ArrayList<>();
         for (int i = 0; i < ints.length; i++) {
-            result.addAll(getNearbyLivingEntities(invoker,i));
+            result.addAll(getNearbyLivingEntities(invoker, ((Number) ints[i]).toInteger()));
         }
         return result.toArray(new LivingEntity[0]);
     }

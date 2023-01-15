@@ -24,7 +24,7 @@ public class IfCallableActuator extends CallableActuator{
     }
 
     @Override
-    public Object[] call(Player caller) {
+    public void call(Player caller) {
         for (Object pre : predicate.select(caller)) {
             if(((Boolean) pre)) {
                 for (CallableActuator callableActuator : callableActuators) {
@@ -36,6 +36,5 @@ public class IfCallableActuator extends CallableActuator{
                 }
             }
         }
-        return new Object[0];
     }
 }

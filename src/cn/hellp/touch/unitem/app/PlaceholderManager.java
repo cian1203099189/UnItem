@@ -9,17 +9,27 @@ import java.util.Map;
 
 public class PlaceholderManager {
     private final Map<String, Var> placeholderMap = new HashMap<>();
+    private PlaceholderManager parent;
 
-    public void put(@Nonnull String name,@Nonnull ISelector<?> o) {
+    public PlaceholderManager getParent() {
+        return parent;
+    }
+
+    public void setParent(PlaceholderManager parent) {
+        this.parent = parent;
+    }
+
+    public void put(@Nonnull String name, @Nonnull ISelector<?> o) {
         if(placeholderMap.containsKey(name)) {
             replace(name,o);
             return;
         }
-        placeholderMap.put(name,new Var(o));
+        placeholderMap.put(name,new Var(o,name));
     }
 
     public boolean contains(String s) {
-        return placeholderMap.containsKey(s);
+        boolean b =  placeholderMap.containsKey(s);
+        return b || ((parent!=null) && parent.contains(s));
     }
 
     public void putVar(@Nonnull String name,@Nonnull Var o) {
@@ -32,13 +42,19 @@ public class PlaceholderManager {
 
     public ISelector<?> get(String name) {
         if(!placeholderMap.containsKey(name)) {
+            if(parent!=null && parent.contains(name)) {
+                return parent.get(name);
+            }
             throw new RuntimeException("can't find placeholder \""+name+"\"");
         }
-        return placeholderMap.get(name);
+        return placeholderMap.get(name).getValue();
     }
 
     public Var getVar(String name) {
         if(!placeholderMap.containsKey(name)) {
+            if(parent!=null && parent.contains(name)) {
+                return parent.getVar(name);
+            }
             throw new RuntimeException("can't find placeholder \""+name+"\"");
         }
         return placeholderMap.get(name);
@@ -56,16 +72,15 @@ public class PlaceholderManager {
 
     public void replace(String name,ISelector<?> o) {
         placeholderMap.get(name).setValue(o);
+        if(parent!=null && parent.contains(name)) {
+            parent.replace(name,o);
+        }
     }
 
     public void replaceVar(String name,Var o) {
         placeholderMap.replace(name,o);
-    }
-
-    public ISelector<?> delete(String name) {
-        if(placeholderMap.containsKey(name)) {
-            return placeholderMap.remove(name);
+        if(parent!=null && parent.contains(name)) {
+            parent.replaceVar(name,o);
         }
-        return null;
     }
 }
