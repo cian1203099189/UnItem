@@ -68,7 +68,7 @@ public class CommandHandler implements CommandExecutor {
                     if(error == null) {
                         sender.sendMessage(ChatColor.AQUA + "Reloaded skills.");
                     } else {
-                        sender.sendMessage(ChatColor.RED + "Reloaded skills with " +ChatColor.DARK_RED + error.count()+" error(s).");
+                        sender.sendMessage(ChatColor.RED + "Reloaded skills with " +ChatColor.DARK_RED + error.count()+ChatColor.RED+" error(s).");
                         sender.sendMessage(ChatColor.RED+"Please check the console.");
                     }
                     return true;
@@ -88,7 +88,7 @@ public class CommandHandler implements CommandExecutor {
                     if(error == null) {
                         sender.sendMessage(ChatColor.AQUA + "Reloaded items.");
                     } else {
-                        sender.sendMessage(ChatColor.RED + "Reloaded items with " +ChatColor.DARK_RED + error.count()+" error(s).");
+                        sender.sendMessage(ChatColor.RED + "Reloaded items with " +ChatColor.DARK_RED + error.count()+ChatColor.RED+" error(s).");
                         sender.sendMessage(ChatColor.RED+"Please check the console.");
                     }
                     return true;

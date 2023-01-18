@@ -1,19 +1,20 @@
 package cn.hellp.touch.unitem.app;
 
+import cn.hellp.touch.unitem.app.parser.CodeNode;
+import cn.hellp.touch.unitem.app.parser.UEnv;
 import org.bukkit.entity.Player;
 
 public class Skill {
-    private final ActuatorList actuatorList;
+    private final CodeNode runnable;
     private final String name;
 
-    public Skill(ActuatorList actuatorList, String name) {
-        this.actuatorList = actuatorList;
+    public Skill(CodeNode c, String name) {
+        this.runnable = c;
         this.name = name;
     }
 
     public void call(Player caller) {
-        actuatorList.foreach(callableActuator -> {
-            callableActuator.call(caller);
-        });
+        UEnv env = new UEnv(caller);
+        runnable.eval(env);
     }
 }

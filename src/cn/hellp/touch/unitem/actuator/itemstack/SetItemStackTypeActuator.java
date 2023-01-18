@@ -18,6 +18,9 @@ public class SetItemStackTypeActuator implements IActuator {
             Material material = ((Material) target[1]);
             itemStack.setType(material);
         }
+        if (itemStack.getType() != Material.AIR) {
+            itemStack.setAmount(Math.max(itemStack.getAmount(), 1));
+        }
         return itemStack;
     }
 

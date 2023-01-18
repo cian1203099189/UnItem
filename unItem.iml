@@ -22,5 +22,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="annotations-23.0.0" level="project" />
     <orderEntry type="library" name="patched_1.12.2" level="project" />
+    <orderEntry type="library" name="VaultAPI-1.7.1" level="project" />
   </component>
 </module>

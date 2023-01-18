@@ -20,7 +20,7 @@ public class PlaceholderManager {
     }
 
     public void put(@Nonnull String name, @Nonnull ISelector<?> o) {
-        if(placeholderMap.containsKey(name)) {
+        if(placeholderMap.containsKey(name) || (parent!=null && parent.contains(name))) {
             replace(name,o);
             return;
         }
@@ -33,7 +33,7 @@ public class PlaceholderManager {
     }
 
     public void putVar(@Nonnull String name,@Nonnull Var o) {
-        if(placeholderMap.containsKey(name)) {
+        if(placeholderMap.containsKey(name)|| (parent!=null && parent.contains(name))) {
             replaceVar(name,o);
             return;
         }
@@ -71,14 +71,16 @@ public class PlaceholderManager {
     }
 
     public void replace(String name,ISelector<?> o) {
-        placeholderMap.get(name).setValue(o);
+        if(placeholderMap.containsKey(name))
+            placeholderMap.get(name).setValue(o);
         if(parent!=null && parent.contains(name)) {
             parent.replace(name,o);
         }
     }
 
     public void replaceVar(String name,Var o) {
-        placeholderMap.replace(name,o);
+        if (placeholderMap.containsKey(name))
+            placeholderMap.replace(name,o);
         if(parent!=null && parent.contains(name)) {
             parent.replaceVar(name,o);
         }

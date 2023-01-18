@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="VaultAPI-1.7.1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../JavaLibrarys/VaultAPI/VaultAPI-1.7.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

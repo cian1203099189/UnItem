@@ -1,5 +1,7 @@
 package cn.hellp.touch.unitem.auxiliary;
 
+import java.util.Objects;
+
 public class Number {
     private final Object value;
 
@@ -43,6 +45,10 @@ public class Number {
 
     public Number divide(Number n) {
         return new Number(toDouble()/n.toDouble());
+    }
+
+    public Number remainder(Number n) {
+        return new Number(toDouble()%n.toDouble());
     }
 
     public Double toDouble() {
@@ -126,5 +132,15 @@ public class Number {
         return value.toString();
     }
 
-
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == this) {
+            return true;
+        }
+        if(getClass()!=obj.getClass()) {
+            return false;
+        }
+        Number obj1 = (Number) obj;
+        return Objects.equals(obj1.value,this.value);
+    }
 }

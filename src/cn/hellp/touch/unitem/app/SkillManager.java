@@ -1,13 +1,18 @@
 package cn.hellp.touch.unitem.app;
 
-import cn.hellp.touch.unitem.app.sentence.SentenceFactory;
-import cn.hellp.touch.unitem.auxiliary.ERROR;
+import cn.hellp.touch.unitem.app.parser.ParseReader;
+import cn.hellp.touch.unitem.app.parser.block.CodeBlock;
 import cn.hellp.touch.unitem.plugin.Main;
 import org.bukkit.entity.Player;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SkillManager {
     private static int loadedSkillCount = 0;
@@ -15,24 +20,21 @@ public class SkillManager {
     private static final Map<String,Skill> skillMap = new HashMap<>();
 
     public static Skill loadSkill(File file) {
-        try {
-            FileInputStream is =new FileInputStream(file);
-            SentenceReader reader = new SentenceReader(is);
-            String line;
-            PlaceholderManager manager = new PlaceholderManager();
-            ActuatorList actuatorList = new ActuatorList();
-            SentenceFactory factory = new SentenceFactory(manager,actuatorList);
-            while ((line= reader.readSentence())!=null && !line.isEmpty()) {
-                factory.create(line);
-            }
-            factory.cleanUp();
-            String name = file.getName().substring(0,file.getName().lastIndexOf("."));
-            Skill skill = new Skill(actuatorList, name);
-            skillMap.put(name,skill);
+        try (FileInputStream fs = new FileInputStream(file)) {
+            String name = file.getName();
+            name=name.substring(0,name.lastIndexOf("."));
+            byte[] bytes = new byte[fs.available()];
+            fs.read(bytes);
+            String text = new String(bytes,StandardCharsets.UTF_8);
+            ParseReader reader = new ParseReader(text);
+            CodeBlock codeBlock = new CodeBlock();
+            codeBlock.parser(reader);
+            Skill skill = new Skill(codeBlock,name);
+            skillMap.put(name, skill);
             ++loadedSkillCount;
             return skill;
         } catch (IOException e) {
-            throw new ERROR(e);
+            throw new RuntimeException(e);
         }
     }
 

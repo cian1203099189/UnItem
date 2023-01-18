@@ -5,21 +5,28 @@ import cn.hellp.touch.unitem.selector.ValueSelector;
 import cn.hellp.touch.unitem.auxiliary.Number;
 import org.bukkit.entity.Player;
 
-public class GetFromIndexSelector<t> extends ValueSelector<t> {
+import java.util.ArrayList;
+import java.util.List;
+
+public class GetFromIndexSelector extends ValueSelector {
     private final ISelector<?> selector;
-    private final ValueSelector<?> index;
+    private final ISelector<?> index;
 
 
-    public GetFromIndexSelector(ISelector<?> selector,ValueSelector<?> index) {
+    public GetFromIndexSelector(ISelector<?> selector,ISelector<?> index) {
         super(null);
         this.selector=selector;
         this.index=index;
     }
 
     @Override
-    public t[] select(Player invoker) {
-        t[] ts = (t[]) selector.select(invoker);
-        return (t[]) new Object[] {ts[((Number) index.select(invoker)[0]).toInteger()]};
+    public Object[] select(Player invoker) {
+        List<Object> result = new ArrayList<>();
+        Object[] objs = selector.select(invoker);
+        for (Object o : index.select(invoker)) {
+            result.add(objs[((Number) o).toInteger()]);
+        }
+        return result.toArray(new Object[0]);
     }
 
     @Override

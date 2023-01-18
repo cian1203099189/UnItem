@@ -5,11 +5,14 @@ import cn.hellp.touch.unitem.auxiliary.ERROR;
 import cn.hellp.touch.unitem.item.UnItemFactory;
 import cn.hellp.touch.unitem.item.UnItemManager;
 import cn.hellp.touch.unitem.listener.PlayerDamageListener;
+import cn.hellp.touch.unitem.support.MoneySupport;
 import cn.hellp.touch.unitem.trigger.Trigger;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.SimplePluginManager;
@@ -27,6 +30,40 @@ import java.util.logging.Logger;
 public class Main extends JavaPlugin {
     private static Main INSTANCE;
     public static String nbtPrefix = "UnItem";
+    private static FileConfiguration config;
+
+    public static class Setting {
+        protected String value;
+
+        public Setting(String value) {
+            this.value = value;
+        }
+
+        public boolean asBoolean() {
+            return Boolean.parseBoolean(value);
+        }
+
+        public int asInt() {
+            return Integer.parseInt(value);
+        }
+
+        public double asDouble() {
+            return Double.parseDouble(value);
+        }
+
+        public float asFloat() {
+            return Float.parseFloat(value);
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
+    }
+
+    public static Setting getSetting(String key) {
+        return new Setting(config.getString(key));
+    }
 
     @Override
     public void onLoad() {
@@ -102,10 +139,21 @@ public class Main extends JavaPlugin {
         return null;
     }
 
+    private static void initSupports() {
+        if(!MoneySupport.INSTANCE.init()) {
+            getMainLogger().warning("[Vault] dependency not found. Will not use the money about.");
+        }
+    }
+
     private static void initListeners() {
         PluginManager manager = Bukkit.getPluginManager();
         manager.registerEvents(new PlayerDamageListener(),INSTANCE);
         manager.registerEvents(new Trigger(),INSTANCE);
+    }
+
+    private static void initConfig() {
+        INSTANCE.saveDefaultConfig();
+        config = INSTANCE.getConfig();
     }
 
 
@@ -126,5 +174,7 @@ public class Main extends JavaPlugin {
         loadSkills();
         initListeners();
         loadItems();
+        initConfig();
+        initSupports();
     }
 }
