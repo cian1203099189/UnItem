@@ -29,7 +29,7 @@ public abstract class PlayerGetter extends Getter<Player> {
             if(o==null) {
                 return new Object[0];
             }
-            if(o instanceof Number) {
+            if(o instanceof java.lang.Number) {
                 o = new Number(o);
             }
             return new Object[] {o};
@@ -37,7 +37,7 @@ public abstract class PlayerGetter extends Getter<Player> {
             List<Object> result = new ArrayList<>();
             for (Object player : target.select(invoker)) {
                 o= get(((Player) player));
-                if(o instanceof Number) {
+                if(o instanceof java.lang.Number) {
                     o = new Number(o);
                 }
                 if(o!=null) {

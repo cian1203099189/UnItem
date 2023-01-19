@@ -142,10 +142,10 @@ public class Main extends JavaPlugin {
 
     private static void initSupports() {
         if(!MoneySupport.INSTANCE.init()) {
-            Bukkit.getConsoleSender().sendMessage("§a[Vault] dependency not found. Will not use the money about.");
+            Bukkit.getConsoleSender().sendMessage("§aUnItem >Vault dependency not found. Will not use the money about.");
         }
         if(!ItemsAdderSupport.INSTANCE.init()) {
-            Bukkit.getConsoleSender().sendMessage("§a[ItemsAdder] dependency not found. Will not use the itemsAdder about.");
+            Bukkit.getConsoleSender().sendMessage("§aUnItem >ItemsAdder dependency not found. Will not use the itemsAdder about.");
         }
     }
 

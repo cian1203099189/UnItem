@@ -67,8 +67,6 @@ public class Registry<T> {
         ACTUATOR.register(actuator.actuatorID(), actuator);
         actuator = new SetItemStackTypeActuator();
         ACTUATOR.register(actuator.actuatorID(), actuator);
-        actuator = new SetVelocityActuator();
-        ACTUATOR.register(actuator.actuatorID(), actuator);
         actuator = new SetGameModeActuator();
         ACTUATOR.register(actuator.actuatorID(), actuator);
         actuator = new PerformCommandActuator();

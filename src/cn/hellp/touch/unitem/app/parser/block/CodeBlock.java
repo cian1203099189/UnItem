@@ -59,7 +59,7 @@ public class CodeBlock implements Block{
                 }
             }
         } catch (ERROR error) {
-            throw new ERROR("Wrong config of line "+line,error);
+            throw new ERROR("Wrong config of line "+(line+1),error);
         }
         return null;
     }

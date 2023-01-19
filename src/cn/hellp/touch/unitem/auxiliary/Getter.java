@@ -25,6 +25,9 @@ public abstract class Getter<T> implements ISelector{
         List<Object> result = new ArrayList<>();
         for (Object player : target.select(invoker)) {
             o= get(((T) player));
+            if(o instanceof java.lang.Number) {
+                o = new Number(o);
+            }
             if(o!=null) {
                 result.add(o);
             }
