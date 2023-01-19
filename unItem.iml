@@ -23,5 +23,6 @@
     <orderEntry type="library" name="annotations-23.0.0" level="project" />
     <orderEntry type="library" name="patched_1.12.2" level="project" />
     <orderEntry type="library" name="VaultAPI-1.7.1" level="project" />
+    <orderEntry type="library" name="api-itemsadder-3.2.5" level="project" />
   </component>
 </module>

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class UnItem {
-    private ItemBuilder itemBuilder;
+    private BaseBuilder itemBuilder;
     private final Map<Trigger.Timing, List<String>> triggerMap = new HashMap<>();
     private final String name;
 
@@ -25,7 +25,7 @@ public class UnItem {
         return name;
     }
 
-    public ItemBuilder getItemBuilder() {
+    public BaseBuilder getItemBuilder() {
         return itemBuilder;
     }
 
@@ -33,7 +33,7 @@ public class UnItem {
         triggerMap.put(timing,skill);
     }
 
-    public void setItemBuilder(ItemBuilder itemBuilder) {
+    public void setItemBuilder(BaseBuilder itemBuilder) {
         this.itemBuilder = itemBuilder;
     }
 

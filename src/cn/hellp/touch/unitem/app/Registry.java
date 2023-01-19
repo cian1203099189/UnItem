@@ -4,9 +4,7 @@ import cn.hellp.touch.unitem.actuator.IActuator;
 import cn.hellp.touch.unitem.actuator.PerformCommandActuator;
 import cn.hellp.touch.unitem.actuator.block.SetBlockTypeActuator;
 import cn.hellp.touch.unitem.actuator.entity.*;
-import cn.hellp.touch.unitem.actuator.entity.player.SetCanFlyActuator;
 import cn.hellp.touch.unitem.actuator.entity.player.SetGameModeActuator;
-import cn.hellp.touch.unitem.actuator.entity.player.SetOpActuator;
 import cn.hellp.touch.unitem.actuator.itemstack.SetItemStackDisplayNameActuator;
 import cn.hellp.touch.unitem.actuator.itemstack.SetItemStackTypeActuator;
 import cn.hellp.touch.unitem.auxiliary.ERROR;
@@ -38,45 +36,19 @@ import cn.hellp.touch.unitem.selector.tools.location.YOf;
 import cn.hellp.touch.unitem.selector.tools.location.ZOf;
 import cn.hellp.touch.unitem.selector.tools.number.AddNumber;
 import cn.hellp.touch.unitem.selector.tools.number.SubNumber;
-import cn.hellp.touch.unitem.selector.tools.player.PlayerCanFlyGetterSetter;
-import cn.hellp.touch.unitem.selector.tools.player.PlayerGetter;
 import cn.hellp.touch.unitem.selector.tools.player.PlayerNameGetter;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Registry<T> {
     public static final Registry<IActuator> ACTUATOR = new Registry<>();
     public static final Registry<SelectorFactory> SELECTOR = new Registry<>();
 
-    private Registry() {}
-    private final Map<String,T> map = new HashMap<>();
-
-    public void register(String id,T eme) {
-        map.putIfAbsent(id,eme);
-    }
-
-    public T get(String id) {
-        return map.get(id);
-    }
-
-    public void update(String id,T newOne) {
-        map.replace(id,newOne);
-    }
-
-    public void delete(String id) {
-        map.remove(id);
-    }
-
-    public Collection<T> getAll() {
-        return new ArrayList<>(map.values());
-    }
-
     static {
-        SELECTOR.register("owner_player",new SelectorFactory((ISelector<?>[] s) -> new CallingPlayerSelector()));
-        SELECTOR.register("console",new SelectorFactory((ISelector<?>[] s) ->  new ConsoleSelector()));
+        SELECTOR.register("owner_player", new SelectorFactory((ISelector<?>[] s) -> new CallingPlayerSelector()));
+        SELECTOR.register("console", new SelectorFactory((ISelector<?>[] s) -> new ConsoleSelector()));
 
         IActuator actuator;
         actuator = new KillEntityActuator();
@@ -97,11 +69,7 @@ public class Registry<T> {
         ACTUATOR.register(actuator.actuatorID(), actuator);
         actuator = new SetVelocityActuator();
         ACTUATOR.register(actuator.actuatorID(), actuator);
-        actuator = new SetCanFlyActuator();
-        ACTUATOR.register(actuator.actuatorID(), actuator);
         actuator = new SetGameModeActuator();
-        ACTUATOR.register(actuator.actuatorID(), actuator);
-        actuator = new SetOpActuator();
         ACTUATOR.register(actuator.actuatorID(), actuator);
         actuator = new PerformCommandActuator();
         ACTUATOR.register(actuator.actuatorID(), actuator);
@@ -112,35 +80,55 @@ public class Registry<T> {
         getterSetter = new cn.hellp.touch.unitem.selector.tools.player.PlayerCanFlyGetterSetter();
         ACTUATOR.register(actuator.actuatorID(), getterSetter);
         SELECTOR.register(getterSetter.selectorID(), createFactoryFromClass(getterSetter.getClass()));
-        getterSetter =new cn.hellp.touch.unitem.selector.tools.player.PlayerExpGetterSetter();
+        getterSetter = new cn.hellp.touch.unitem.selector.tools.player.PlayerExpGetterSetter();
         ACTUATOR.register(actuator.actuatorID(), getterSetter);
         SELECTOR.register(getterSetter.selectorID(), createFactoryFromClass(getterSetter.getClass()));
-        getterSetter =new cn.hellp.touch.unitem.selector.tools.player.PlayerFoodLevelGetterSetter();
+        getterSetter = new cn.hellp.touch.unitem.selector.tools.player.PlayerFoodLevelGetterSetter();
         ACTUATOR.register(actuator.actuatorID(), getterSetter);
         SELECTOR.register(getterSetter.selectorID(), createFactoryFromClass(getterSetter.getClass()));
-        getterSetter =new cn.hellp.touch.unitem.selector.tools.player.PlayerLevelGetterSetter();
+        getterSetter = new cn.hellp.touch.unitem.selector.tools.player.PlayerLevelGetterSetter();
         ACTUATOR.register(actuator.actuatorID(), getterSetter);
         SELECTOR.register(getterSetter.selectorID(), createFactoryFromClass(getterSetter.getClass()));
-        getterSetter =new cn.hellp.touch.unitem.selector.tools.player.PlayerMoneyGetterSetter();
+        getterSetter = new cn.hellp.touch.unitem.selector.tools.player.PlayerMoneyGetterSetter();
         ACTUATOR.register(actuator.actuatorID(), getterSetter);
         SELECTOR.register(getterSetter.selectorID(), createFactoryFromClass(getterSetter.getClass()));
-        getterSetter =new cn.hellp.touch.unitem.selector.tools.player.PlayerOpGetterSetter();
+        getterSetter = new cn.hellp.touch.unitem.selector.tools.player.PlayerOpGetterSetter();
         ACTUATOR.register(actuator.actuatorID(), getterSetter);
         SELECTOR.register(getterSetter.selectorID(), createFactoryFromClass(getterSetter.getClass()));
-        getterSetter =new cn.hellp.touch.unitem.selector.tools.player.PlayerSneakingGetterSetter();
+        getterSetter = new cn.hellp.touch.unitem.selector.tools.player.PlayerSneakingGetterSetter();
         ACTUATOR.register(actuator.actuatorID(), getterSetter);
         SELECTOR.register(getterSetter.selectorID(), createFactoryFromClass(getterSetter.getClass()));
-        getterSetter =new cn.hellp.touch.unitem.selector.tools.player.PlayerSprintingGetterSetter();
+        getterSetter = new cn.hellp.touch.unitem.selector.tools.player.PlayerSprintingGetterSetter();
         ACTUATOR.register(actuator.actuatorID(), getterSetter);
         SELECTOR.register(getterSetter.selectorID(), createFactoryFromClass(getterSetter.getClass()));
-        getterSetter =new cn.hellp.touch.unitem.selector.tools.player.PlayerTimeGetterSetter();
+        getterSetter = new cn.hellp.touch.unitem.selector.tools.player.PlayerTimeGetterSetter();
+        ACTUATOR.register(actuator.actuatorID(), getterSetter);
+        SELECTOR.register(getterSetter.selectorID(), createFactoryFromClass(getterSetter.getClass()));
+        getterSetter = new cn.hellp.touch.unitem.selector.tools.entity.living.LivingEntityKillerGetterSetter();
+        ACTUATOR.register(actuator.actuatorID(), getterSetter);
+        SELECTOR.register(getterSetter.selectorID(), createFactoryFromClass(getterSetter.getClass()));
+        getterSetter = new cn.hellp.touch.unitem.selector.tools.entity.living.LivingEntityRemainingAirGetterSetter();
+        ACTUATOR.register(actuator.actuatorID(), getterSetter);
+        SELECTOR.register(getterSetter.selectorID(), createFactoryFromClass(getterSetter.getClass()));
+        getterSetter = new cn.hellp.touch.unitem.selector.tools.entity.EntityCustomNameGetterSetter();
+        ACTUATOR.register(actuator.actuatorID(), getterSetter);
+        SELECTOR.register(getterSetter.selectorID(), createFactoryFromClass(getterSetter.getClass()));
+        getterSetter = new cn.hellp.touch.unitem.selector.tools.entity.EntityFireTicksGetterSetter();
+        ACTUATOR.register(actuator.actuatorID(), getterSetter);
+        SELECTOR.register(getterSetter.selectorID(), createFactoryFromClass(getterSetter.getClass()));
+        getterSetter = new cn.hellp.touch.unitem.selector.tools.entity.EntityVelocityGetterSetter();
         ACTUATOR.register(actuator.actuatorID(), getterSetter);
         SELECTOR.register(getterSetter.selectorID(), createFactoryFromClass(getterSetter.getClass()));
 
         Constructor<?> selectorConstructor;
         Constructor<?> selectorConstructor1;
         try {
-            SELECTOR.register("getPlayerName",createFactoryFromClass(PlayerNameGetter.class));
+            SELECTOR.register("getPlayerName", createFactoryFromClass(PlayerNameGetter.class));
+            SELECTOR.register("getEntityActiveItem", createFactoryFromClass(cn.hellp.touch.unitem.selector.tools.entity.living.LivingEntityActiveItemGetter.class));
+            SELECTOR.register("isOnGround", createFactoryFromClass(cn.hellp.touch.unitem.selector.tools.entity.EntityIsOnGroundGetter.class));
+            SELECTOR.register("getEntityLocation", createFactoryFromClass(cn.hellp.touch.unitem.selector.tools.entity.EntityLocationGetter.class));
+            SELECTOR.register("getEntityType", createFactoryFromClass(cn.hellp.touch.unitem.selector.tools.entity.EntityTypeGetter.class));
+            SELECTOR.register("getEntityUUID", createFactoryFromClass(cn.hellp.touch.unitem.selector.tools.entity.EntityUniqueIdGetter.class));
 
             selectorConstructor = LastDamageSourceEntitySelector.class.getDeclaredConstructor();
             selectorConstructor1 = LastDamageSourceEntitySelector.class.getDeclaredConstructor(ISelector.class);
@@ -218,13 +206,18 @@ public class Registry<T> {
 
             selectorConstructor = LocationToVecSelector.class.getDeclaredConstructor(ISelector.class);
             SELECTOR.register("locToVector", putConstruct(listOf(selectorConstructor)));
-    }catch (Exception ed) {
+        } catch (Exception ed) {
             throw new ERROR(ed);
         }
     }
 
+    private final Map<String, T> map = new HashMap<>();
+
+    private Registry() {
+    }
+
     private static SelectorFactory putConstruct(Collection<Constructor<?>> constructors) {
-        return new SelectorFactory((ISelector<?>[] s)-> {
+        return new SelectorFactory((ISelector<?>[] s) -> {
             for (Constructor<?> constructor : constructors) {
                 if (constructor.getParameterCount() == s.length) {
                     try {
@@ -244,9 +237,29 @@ public class Registry<T> {
     }
 
     @SafeVarargs
-    public static <T> List<T> listOf(T... eme) {
+    private static <T> List<T> listOf(T... eme) {
         List<T> result = new ArrayList<>();
         Collections.addAll(result, eme);
         return result;
+    }
+
+    public void register(String id, T eme) {
+        map.putIfAbsent(id, eme);
+    }
+
+    public T get(String id) {
+        return map.get(id);
+    }
+
+    public void update(String id, T newOne) {
+        map.replace(id, newOne);
+    }
+
+    public void delete(String id) {
+        map.remove(id);
+    }
+
+    public Collection<T> getAll() {
+        return new ArrayList<>(map.values());
     }
 }

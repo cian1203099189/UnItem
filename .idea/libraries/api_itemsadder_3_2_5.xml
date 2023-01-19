@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="api-itemsadder-3.2.5">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../JavaLibrarys/ItemAdder-API/api-itemsadder-3.2.5.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

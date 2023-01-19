@@ -5,6 +5,7 @@ import cn.hellp.touch.unitem.auxiliary.ERROR;
 import cn.hellp.touch.unitem.item.UnItemFactory;
 import cn.hellp.touch.unitem.item.UnItemManager;
 import cn.hellp.touch.unitem.listener.PlayerDamageListener;
+import cn.hellp.touch.unitem.support.ItemsAdderSupport;
 import cn.hellp.touch.unitem.support.MoneySupport;
 import cn.hellp.touch.unitem.trigger.Trigger;
 import org.bukkit.Bukkit;
@@ -141,7 +142,10 @@ public class Main extends JavaPlugin {
 
     private static void initSupports() {
         if(!MoneySupport.INSTANCE.init()) {
-            getMainLogger().warning("[Vault] dependency not found. Will not use the money about.");
+            Bukkit.getConsoleSender().sendMessage("§a[Vault] dependency not found. Will not use the money about.");
+        }
+        if(!ItemsAdderSupport.INSTANCE.init()) {
+            Bukkit.getConsoleSender().sendMessage("§a[ItemsAdder] dependency not found. Will not use the itemsAdder about.");
         }
     }
 
@@ -168,7 +172,7 @@ public class Main extends JavaPlugin {
         sender.sendMessage("§a ╚██████╔╝██║ ╚████║██║   ██║   ███████╗██║ ╚═╝ ██║ ");
         sender.sendMessage("§a  ╚═════╝ ╚═╝  ╚═══╝╚═╝   ╚═╝   ╚══════╝╚═╝     ╚═╝ ");
         sender.sendMessage("                                                    ");
-        sender.sendMessage("§a      作者：zZZZ                       版本1.0        ");
+        sender.sendMessage("§a   作者：zZZZ(也称不是辞安或Touch)       版本1.0         ");
         sender.sendMessage("§a----------------------------------------------------  ");
         initCommands();
         loadSkills();

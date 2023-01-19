@@ -19,46 +19,9 @@ public class UnItemFactory {
         YamlConfiguration configuration = new YamlConfiguration();
         try {
             configuration.load(file);
-            String name = configuration.getString("name");
-            String material = configuration.getString("material");
-            if(name==null || material==null) {
-                throw new RuntimeException("can't load item from "+file.getName());
-            }
-            UnItem item = new UnItem(name);
-            ItemBuilder builder = new ItemBuilder();
-            builder.setNbtValue(name);
-            builder.setMaterial(Material.getMaterial(material));
-            if(configuration.contains("displayName")) {
-                builder.setDisplayName(configuration.getString("displayName"));
-            }
-            if(configuration.contains("lore")) {
-                builder.setLore(configuration.getStringList("lore"));
-            }
-            if(configuration.contains("enchants")) {
-                ConfigurationSection enchantsConfig = configuration.getConfigurationSection("enchants");
-                if(enchantsConfig!=null) {
-                    for (String enchantName : enchantsConfig.getKeys(false)) {
-                        Enchantment enchantment = Enchantment.getByName(enchantName);
-                        if(enchantment!=null) {
-                            short i = Short.parseShort(Objects.requireNonNull(enchantsConfig.getString(enchantName)));
-                            builder.addEnchantments(enchantment,i);
-                        }
-                    }
-                }
-            }
-            if(configuration.contains("item-flags")) {
-                List<String> flags = configuration.getStringList("item-flags");
-                for (String flag : flags) {
-                    try {
-                        ItemFlag itemFlag = ItemFlag.valueOf(flag);
-                        builder.addItemFlags(itemFlag);
-                    } catch (Exception ignored) {}
-                }
-            }
-            if(configuration.contains("unbreakable")) {
-                builder.setUnbreakable(configuration.getBoolean("unbreakable"));
-            }
-            item.setItemBuilder(builder);
+            BaseBuilder builder = configuration.contains("attribute") ? BuilderAttribute.getFromName(configuration.getString("attribute")).createBuilder() : new ItemBuilder();
+            builder.load(configuration);
+            UnItem item = new UnItem(builder.getName());
             if(configuration.contains("skills")) {
                 ConfigurationSection skillsSection = configuration.getConfigurationSection("skills");
                 if(skillsSection!=null) {
@@ -68,6 +31,7 @@ public class UnItemFactory {
                     }
                 }
             }
+            item.setItemBuilder(builder);
             return item;
         } catch (IOException | InvalidConfigurationException e) {
             throw new ERROR(e);
