@@ -1,6 +1,7 @@
 package cn.hellp.touch.unitem.auxiliary;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Constructor;
@@ -11,11 +12,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class NbtTool {
-    private static final Class<?> craftItemStack;
-    private static final Class<?> nbtTagCompound;
-    private static final Class<?> itemStackClass;
+    public static final Class<?> craftItemStack;
+    public static final Class<?> nbtTagCompound;
+    public static final Class<?> itemStackClass;
     public static final boolean later1_17;
     public static final int server_version;
+    public static final String nmsVersion;
+    public static final String getNbt;
+    public static final String setNbt;
+    public static final String getString;
+    public static final String setString;
+    public static final String getInt;
+    public static final String setInt;
 
     static {
         Pattern p = Pattern.compile("(.*?)(?<v>[0-2]\\.\\d{1,2}(.\\d)?)(.*)");
@@ -44,6 +52,8 @@ public class NbtTool {
             }
         }
 
+        nmsVersion =version_package;
+
         if(later1_17) {
             try {
                 nbtTagCompound=Class.forName("net.minecraft.nbt.NBTTagCompound");
@@ -60,6 +70,12 @@ public class NbtTool {
             }
         }
 
+        getNbt = server_version>17 ? "u" : "getTag";
+        setNbt = server_version>17 ? "c" : "setTag";
+        getString = server_version>17 ? "l" : "getString";
+        setString = server_version>17 ? "a" : "setString";
+        getInt = server_version>17 ? "h" : "getInt";
+        setInt = server_version>17 ? "a" : "setInt";
         try {
             craftItemStack=Class.forName("org.bukkit.craftbukkit."+version_package+".inventory.CraftItemStack");
         } catch (ClassNotFoundException e) {
@@ -90,8 +106,8 @@ public class NbtTool {
     public static ItemStack setString(ItemStack itemStack,String key,String value) {
         Object compound = getNBTCompound(itemStack);
         Object craftItem = callMethod(craftItemStack,null,"asCraftCopy",new Class[]{ItemStack.class},itemStack);
-        callMethod(nbtTagCompound,compound,"setString",new Class[]{String.class,String.class},key,value);
-        callMethod(itemStackClass,getField(craftItemStack,craftItem,"handle"),"setTag",new Class[]{nbtTagCompound},compound);
+        callMethod(nbtTagCompound,compound,setString,new Class[]{String.class,String.class},key,value);
+        callMethod(itemStackClass,getField(craftItemStack,craftItem,"handle"),setNbt,new Class[]{nbtTagCompound},compound);
         return (ItemStack) craftItem;
     }
 
@@ -103,11 +119,27 @@ public class NbtTool {
         if(handle==null) {
             return "";
         }
-        Object compound = callMethod(itemStackClass,handle,"getTag",new Class[0]);
+        Object compound = callMethod(itemStackClass,handle,getNbt,new Class[0]);
         if(compound == null) {
             return "";
         }
-        return (String) callMethod(nbtTagCompound,compound,"getString",new Class[]{String.class},key);
+        return (String) callMethod(nbtTagCompound,compound,getString,new Class[]{String.class},key);
+    }
+
+    public static int getInteger(ItemStack itemStack,String key) {
+        if(itemStack==null || itemStack.getAmount()==0 || itemStack.getType()== Material.AIR) {
+            return 0;
+        }
+        Object nbt = getNBTCompound(itemStack);
+        return (int) callMethod(nbtTagCompound,nbt,getInt,new Class[]{String.class},key);
+    }
+
+    public static ItemStack setInt(ItemStack itemStack,String key,int value) {
+        Object compound = getNBTCompound(itemStack);
+        Object craftItem = callMethod(craftItemStack,null,"asCraftCopy",new Class[]{ItemStack.class},itemStack);
+        callMethod(nbtTagCompound,compound,setInt,new Class[]{String.class,int.class},key,value);
+        callMethod(itemStackClass,getField(craftItemStack,craftItem,"handle"),setNbt,new Class[]{nbtTagCompound},compound);
+        return (ItemStack) craftItem;
     }
 
     public static Object getNBTCompound(ItemStack itemStack) {
@@ -115,7 +147,7 @@ public class NbtTool {
             return null;
         }
         Object craftItem = callMethod(craftItemStack,null,"asCraftCopy",new Class[]{ItemStack.class},itemStack);
-        Object compound = callMethod(itemStackClass,getField(craftItemStack,craftItem,"handle"),"getTag",new Class[0]);
+        Object compound = callMethod(itemStackClass,getField(craftItemStack,craftItem,"handle"),getNbt,new Class[0]);
         if(compound==null) {
             Constructor<?> constructor;
             try {
@@ -132,26 +164,7 @@ public class NbtTool {
         return compound;
     }
 
-    public static ItemStack setBoolean(ItemStack itemStack,String key,boolean value) {
-        Object compound = getNBTCompound(itemStack);
-        Object craftItem = callMethod(craftItemStack,null,"asCraftCopy",new Class[]{ItemStack.class},itemStack);
-        callMethod(nbtTagCompound,compound,"setBoolean",new Class[]{String.class,boolean.class},key,value);
-        callMethod(itemStackClass,getField(craftItemStack,craftItem,"handle"),"setTag",new Class[]{nbtTagCompound},compound);
-        return (ItemStack) craftItem;
-    }
-
-    public static boolean getBoolean(ItemStack itemStack,String key) {
-        if(itemStack==null) {
-            return false;
-        }
-        Object handle = getField(craftItemStack,callMethod(craftItemStack,null,"asCraftCopy",new Class[]{ItemStack.class},itemStack),"handle");
-        if(handle==null) {
-            return false;
-        }
-        Object compound = callMethod(itemStackClass,handle,"getTag",new Class[0]);
-        if(compound == null) {
-            return false;
-        }
-        return (boolean) callMethod(nbtTagCompound,compound,"getBoolean",new Class[]{String.class},key);
+    public static Object asNmsCopy(ItemStack itemStack) {
+        return callMethod(craftItemStack,null,"asNMSCopy",new Class[] {ItemStack.class},itemStack);
     }
 }

@@ -2,3 +2,5 @@ name: UnItem
 main: cn.hellp.touch.unitem.plugin.Main
 version: 1.0
 author: Touch
+softdepend:
+  - PlaceholderAPI

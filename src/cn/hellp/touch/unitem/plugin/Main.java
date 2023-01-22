@@ -2,22 +2,26 @@ package cn.hellp.touch.unitem.plugin;
 
 import cn.hellp.touch.unitem.app.SkillManager;
 import cn.hellp.touch.unitem.auxiliary.ERROR;
+import cn.hellp.touch.unitem.item.UnItem;
 import cn.hellp.touch.unitem.item.UnItemFactory;
 import cn.hellp.touch.unitem.item.UnItemManager;
+import cn.hellp.touch.unitem.item.style.StyleManager;
+import cn.hellp.touch.unitem.item.style.dynamic.PlayerNetworkListener;
 import cn.hellp.touch.unitem.listener.PlayerDamageListener;
 import cn.hellp.touch.unitem.support.ItemsAdderSupport;
 import cn.hellp.touch.unitem.support.MoneySupport;
+import cn.hellp.touch.unitem.support.PlaceholderAPISupport;
 import cn.hellp.touch.unitem.trigger.Trigger;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -25,7 +29,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Logger;
 
 public class Main extends JavaPlugin {
@@ -89,7 +95,6 @@ public class Main extends JavaPlugin {
             command.setExecutor(new CommandHandler());
             command.setTabCompleter(new TabCompleter());
             command.setAliases(Collections.emptyList());
-            command.setName(cmdName);
 
             Field field = SimplePluginManager.class.getDeclaredField("commandMap");
             field.setAccessible(true);
@@ -124,11 +129,16 @@ public class Main extends JavaPlugin {
         return null;
     }
 
+    private static final Set<Integer> tasks = new HashSet<>();
+
     public static ERROR loadItems() {
         UnItemManager.clear();
+        tasks.forEach(task -> Bukkit.getScheduler().cancelTask(task));
+        tasks.clear();
         for (File file : Objects.requireNonNull(Main.getResourceFolder("items").listFiles(pathname -> pathname.getName().endsWith("ui")))) {
             try {
                 UnItemManager.addItem(UnItemFactory.loadFile(file));
+                tasks.add(Bukkit.getScheduler().runTaskTimer(INSTANCE, UnItem::update, 0, getSetting("update-time").asInt()).getTaskId());
             }catch (ERROR error) {
                 getMainLogger().warning("can't load item "+file.getName());
                 error.printStackTrace();
@@ -140,12 +150,26 @@ public class Main extends JavaPlugin {
         return null;
     }
 
+    public static ERROR loadStyles() {
+        StyleManager.clear();
+        try {
+            StyleManager.loadAllStyles();
+        } catch (Exception e) {
+            return new ERROR(e);
+        }
+        PlayerNetworkListener.init();
+        return null;
+    }
+
     private static void initSupports() {
         if(!MoneySupport.INSTANCE.init()) {
-            Bukkit.getConsoleSender().sendMessage("§aUnItem >Vault dependency not found. Will not use the money about.");
+            Bukkit.getConsoleSender().sendMessage("§aUnItem >Vault soft-dependency not found. Will not use the money about.");
         }
         if(!ItemsAdderSupport.INSTANCE.init()) {
-            Bukkit.getConsoleSender().sendMessage("§aUnItem >ItemsAdder dependency not found. Will not use the itemsAdder about.");
+            Bukkit.getConsoleSender().sendMessage("§aUnItem >ItemsAdder soft-dependency not found. Will not use the itemsAdder about.");
+        }
+        if(!PlaceholderAPISupport.INSTANCE.init()) {
+            Bukkit.getConsoleSender().sendMessage("§aUnItem >PlaceholderAPI soft-dependency not found. Will not use the placeholderAPI about.");
         }
     }
 
@@ -174,11 +198,12 @@ public class Main extends JavaPlugin {
         sender.sendMessage("                                                    ");
         sender.sendMessage("§a   作者：zZZZ(也称不是辞安或Touch)       版本1.0         ");
         sender.sendMessage("§a----------------------------------------------------  ");
+        initConfig();
         initCommands();
         loadSkills();
         initListeners();
+        loadStyles();
         loadItems();
-        initConfig();
         initSupports();
     }
 }

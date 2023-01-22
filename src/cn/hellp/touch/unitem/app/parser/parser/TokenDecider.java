@@ -166,5 +166,6 @@ public class TokenDecider implements Parser {
         TokenDecider.identifiers.put("owner_player", (reader, last) -> new KeywordNode(new CallingPlayerSelector()));
         TokenDecider.identifiers.put("true", (reader, last) -> new KeywordNode(new ValueSelector<>(true)));
         TokenDecider.identifiers.put("false", (reader, last) -> new KeywordNode(new ValueSelector<>(false)));
+        TokenDecider.identifiers.put("cancel",(reader, last) -> new CancelEvent());
     }
 }

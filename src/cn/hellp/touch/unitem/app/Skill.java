@@ -2,6 +2,7 @@ package cn.hellp.touch.unitem.app;
 
 import cn.hellp.touch.unitem.app.parser.CodeNode;
 import cn.hellp.touch.unitem.app.parser.UEnv;
+import cn.hellp.touch.unitem.auxiliary.ERROR;
 import org.bukkit.entity.Player;
 
 public class Skill {
@@ -15,6 +16,10 @@ public class Skill {
 
     public void call(Player caller) {
         UEnv env = new UEnv(caller);
-        runnable.eval(env);
+        try {
+            runnable.eval(env);
+        }catch (Exception e) {
+            throw new ERROR("Received some error while calling the skill "+name,e);
+        }
     }
 }

@@ -115,7 +115,7 @@ public class Registry<T> {
         ACTUATOR.register(actuator.actuatorID(), getterSetter);
         SELECTOR.register(getterSetter.selectorID(), createFactoryFromClass(getterSetter.getClass()));
         getterSetter = new cn.hellp.touch.unitem.selector.tools.entity.EntityVelocityGetterSetter();
-        ACTUATOR.register(actuator.actuatorID(), getterSetter);
+        ACTUATOR.register(getterSetter.actuatorID(), getterSetter);
         SELECTOR.register(getterSetter.selectorID(), createFactoryFromClass(getterSetter.getClass()));
 
         Constructor<?> selectorConstructor;

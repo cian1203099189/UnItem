@@ -2,6 +2,7 @@ package cn.hellp.touch.unitem.app.parser.node;
 
 import cn.hellp.touch.unitem.app.parser.*;
 import cn.hellp.touch.unitem.selector.ISelector;
+import cn.hellp.touch.unitem.selector.tools.ArraySelector;
 
 public class LiteralNode implements Assignable , Parser {
     private String name;
@@ -23,7 +24,7 @@ public class LiteralNode implements Assignable , Parser {
 
     @Override
     public ISelector<?> assign(UEnv env, ISelector<?> val) {
-        env.getManager().put(name,val);
+        env.getManager().put(name,new ArraySelector((Object[]) val.select(env.getCaller())));
         return val;
     }
 

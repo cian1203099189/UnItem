@@ -84,11 +84,12 @@ public class CommandHandler implements CommandExecutor {
         subcommands.put("items", new SubCommand(1, (CommandSender sender, String[] args) -> {
             switch (args[0]) {
                 case "reload" : {
+                    ERROR error1 = Main.loadStyles();
                     ERROR error =  Main.loadItems();
-                    if(error == null) {
+                    if(error == null && error1==null) {
                         sender.sendMessage(ChatColor.AQUA + "Reloaded items.");
                     } else {
-                        sender.sendMessage(ChatColor.RED + "Reloaded items with " +ChatColor.DARK_RED + error.count()+ChatColor.RED+" error(s).");
+                        sender.sendMessage(ChatColor.RED + "Reloaded items with " +ChatColor.DARK_RED +(error!=null&&error1!=null ? (error.count()+error1.count()) : (error!=null) ? error.count() : error1.count())+ChatColor.RED+" error(s).");
                         sender.sendMessage(ChatColor.RED+"Please check the console.");
                     }
                     return true;

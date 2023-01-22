@@ -24,4 +24,11 @@ public class Pair<K,V> {
         this.first=first;
         this.second=second;
     }
+
+    @Override
+    public int hashCode() {
+        int result = first!=null ? first.hashCode() : 0;
+        result = 31*result + (second!=null ? second.hashCode() : 0);
+        return result;
+    }
 }

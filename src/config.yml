@@ -1,1 +1,4 @@
+#for语句是否尝试以最大范围执行
 for-MaxRange: true
+#物品动态更新间隔，以tick计
+update-time: 10

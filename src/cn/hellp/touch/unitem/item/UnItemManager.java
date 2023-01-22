@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class UnItemManager {
     private static final Map<String,UnItem> unItems = new HashMap<>();
@@ -23,6 +24,10 @@ public class UnItemManager {
             builder.append("\n");
         }
         return builder.toString();
+    }
+
+    public static void foreach(Consumer<UnItem> unItemConsumer) {
+        unItems.values().forEach(unItemConsumer);
     }
 
     public static List<String> itemNames() {
