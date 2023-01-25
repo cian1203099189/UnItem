@@ -52,12 +52,11 @@ public class UnItem {
 
     public static void update() {
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            if (!(onlinePlayer.getOpenInventory().getTopInventory() instanceof PlayerInventory)) {
-                for (int i = 0; i < onlinePlayer.getOpenInventory().countSlots() - 1; i++) {
+            if (onlinePlayer.getOpenInventory()!=null && !(onlinePlayer.getOpenInventory().getTopInventory() instanceof PlayerInventory)) {
+                for (int i = 0; i < onlinePlayer.getOpenInventory().getTopInventory().getSize() ; i++) {
                     ItemStack itemStack1 = onlinePlayer.getOpenInventory().getItem(i);
                     updateIfIsUnItem(itemStack1, onlinePlayer, i);
                 }
-                continue;
             }
             for (int i = 0; i < onlinePlayer.getInventory().getSize(); i++) {
                 ItemStack itemStack1 = onlinePlayer.getInventory().getItem(i);

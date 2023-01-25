@@ -23,6 +23,7 @@ import cn.hellp.touch.unitem.selector.location.LocationOfEntitySelector;
 import cn.hellp.touch.unitem.selector.location.LocationToVecSelector;
 import cn.hellp.touch.unitem.selector.location.LocationValueSelector;
 import cn.hellp.touch.unitem.selector.tools.GetFromIndexSelector;
+import cn.hellp.touch.unitem.selector.tools.LengthSelector;
 import cn.hellp.touch.unitem.selector.tools.ToStringSelector;
 import cn.hellp.touch.unitem.selector.tools.VectorToLocationSelector;
 import cn.hellp.touch.unitem.selector.tools.block.GetBlockType;
@@ -144,6 +145,8 @@ public class Registry<T> {
 
             selectorConstructor = YOf.class.getDeclaredConstructor(ISelector.class);
             SELECTOR.register("YOf", putConstruct(listOf(selectorConstructor)));
+
+            SELECTOR.register("lengthOf", createFactoryFromClass(LengthSelector.class));
 
             selectorConstructor = ZOf.class.getDeclaredConstructor(ISelector.class);
             SELECTOR.register("ZOf", putConstruct(listOf(selectorConstructor)));

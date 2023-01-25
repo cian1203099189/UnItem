@@ -84,10 +84,12 @@ public class ChannelInjector {
         return versionSupport.getPlayerConnection(entityPlayer);
     }
 
+    private static int latestID = 0;
+
     public static void injectorChannelHandler(Player target, ChannelHandler handler) {
         Object playerConnection = getPlayerConnection(target);
         Object networkManager = versionSupport.getNetworkManager(playerConnection);
         Channel channel = versionSupport.getChannel(networkManager);
-        channel.pipeline().addLast("unItemDynamic",handler);
+        channel.pipeline().addLast("unItem-"+(latestID++),handler);
     }
 }
