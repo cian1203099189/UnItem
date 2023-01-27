@@ -1,6 +1,7 @@
 package cn.hellp.touch.unitem.selector.tools.entity;
 
 import cn.hellp.touch.unitem.auxiliary.GetterSetter;
+import cn.hellp.touch.unitem.selector.ISelector;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,6 +10,10 @@ public class EntityCustomNameGetterSetter extends GetterSetter<Entity> {
     @Override
     public String actuatorID() {
         return "setEntityCustomName";
+    }
+
+    public EntityCustomNameGetterSetter(ISelector<?> target) {
+        super(target);
     }
 
     @Override

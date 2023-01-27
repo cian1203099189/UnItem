@@ -37,10 +37,10 @@ public class Trigger implements Listener {
                         List<String> list = new ArrayList<>();
                         list.add(name);
                         wearingItems.put(player.getUniqueId(), list);
-                        UnItemManager.getItem(name).call(player,Timing.WEARING);
+                        UnItemManager.getItem(name).call(player,Timing.WEARING,null);
                     } else if (!wearingItems.get(player.getUniqueId()).contains(name)) {
                         wearingItems.get(player.getUniqueId()).add(name);
-                        UnItemManager.getItem(name).call(player,Timing.WEARING);
+                        UnItemManager.getItem(name).call(player,Timing.WEARING,null);
                     }
                 }
             }
@@ -63,7 +63,7 @@ public class Trigger implements Listener {
                         }
                     }
                     if(!found) {
-                        UnItemManager.getItem(item).call(player,Timing.UNWEARING);
+                        UnItemManager.getItem(item).call(player,Timing.UNWEARING,null);
                         removeList.add(item);
                     }
                 }
@@ -97,7 +97,7 @@ public class Trigger implements Listener {
         if(e.getDamager() instanceof Player) {
             Player player = (Player)e.getDamager();
             if(UnItemManager.getItem(holdingItem(player.getInventory()))!=null) {
-                UnItemManager.getItem(holdingItem(player.getInventory())).call(player,Timing.ATTACK);
+                UnItemManager.getItem(holdingItem(player.getInventory())).call(player,Timing.ATTACK,e);
             }
         }
     }
@@ -107,7 +107,7 @@ public class Trigger implements Listener {
         if(e.getEntity() instanceof Player) {
             Player player = (Player)e.getEntity();
             if(UnItemManager.getItem(holdingItem(player.getInventory()))!=null)
-                UnItemManager.getItem(holdingItem(player.getInventory())).call(player,Timing.SHOT);
+                UnItemManager.getItem(holdingItem(player.getInventory())).call(player,Timing.SHOT,e);
         }
     }
 
@@ -116,7 +116,7 @@ public class Trigger implements Listener {
         if(e.getEntity() instanceof Player) {
             Player player = (Player)e.getEntity();
             if(UnItemManager.getItem(holdingItem(player.getInventory()))!=null) {
-                UnItemManager.getItem(holdingItem(player.getInventory())).call(player,Timing.ATTACK);
+                UnItemManager.getItem(holdingItem(player.getInventory())).call(player,Timing.ATTACK,e);
             }
         }
     }
@@ -126,9 +126,9 @@ public class Trigger implements Listener {
         if(e.hasItem()) {
             if(UnItemManager.contains(getNbt(e.getItem()))) {
                 if(e.getAction()== Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK) {
-                    UnItemManager.getItem(getNbt(e.getItem())).call(e.getPlayer(),Timing.LEFTCLICK);
+                    UnItemManager.getItem(getNbt(e.getItem())).call(e.getPlayer(),Timing.LEFTCLICK,e);
                 } else {
-                    UnItemManager.getItem(getNbt(e.getItem())).call(e.getPlayer(),Timing.RIGHTCLICK);
+                    UnItemManager.getItem(getNbt(e.getItem())).call(e.getPlayer(),Timing.RIGHTCLICK,e);
                 }
             }
         }
@@ -139,9 +139,9 @@ public class Trigger implements Listener {
         String name = holdingItem(e.getPlayer().getInventory());
         if(UnItemManager.contains(name)) {
             if(e.isSneaking()) {
-                UnItemManager.getItem(name).call(e.getPlayer(),Timing.SNEAK);
+                UnItemManager.getItem(name).call(e.getPlayer(),Timing.SNEAK,e);
             } else {
-                UnItemManager.getItem(name).call(e.getPlayer(),Timing.UNSNEAK);
+                UnItemManager.getItem(name).call(e.getPlayer(),Timing.UNSNEAK,e);
             }
         }
     }

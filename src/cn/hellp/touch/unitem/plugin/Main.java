@@ -129,16 +129,15 @@ public class Main extends JavaPlugin {
         return null;
     }
 
-    private static final Set<Integer> tasks = new HashSet<>();
+    private static BukkitTask task= null;
 
     public static ERROR loadItems() {
         UnItemManager.clear();
-        tasks.forEach(task -> Bukkit.getScheduler().cancelTask(task));
-        tasks.clear();
+        if(task!=null) task.cancel();
+        task = Bukkit.getScheduler().runTaskTimer(INSTANCE, UnItem::update, 0, getSetting("update-time").asInt());
         for (File file : Objects.requireNonNull(Main.getResourceFolder("items").listFiles(pathname -> pathname.getName().endsWith("ui")))) {
             try {
                 UnItemManager.addItem(UnItemFactory.loadFile(file));
-                tasks.add(Bukkit.getScheduler().runTaskTimer(INSTANCE, UnItem::update, 0, getSetting("update-time").asInt()).getTaskId());
             }catch (ERROR error) {
                 getMainLogger().warning("can't load item "+file.getName());
                 error.printStackTrace();

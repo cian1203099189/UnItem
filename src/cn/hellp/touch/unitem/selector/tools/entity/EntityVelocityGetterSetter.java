@@ -1,6 +1,7 @@
 package cn.hellp.touch.unitem.selector.tools.entity;
 
 import cn.hellp.touch.unitem.auxiliary.GetterSetter;
+import cn.hellp.touch.unitem.selector.ISelector;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -10,6 +11,10 @@ public class EntityVelocityGetterSetter extends GetterSetter<Entity> {
     @Override
     public String actuatorID() {
         return "setEntityVelocity";
+    }
+
+    public EntityVelocityGetterSetter(ISelector<?> target) {
+        super(target);
     }
 
     @Override

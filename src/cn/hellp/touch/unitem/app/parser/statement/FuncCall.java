@@ -12,6 +12,7 @@ import cn.hellp.touch.unitem.app.parser.operator.Operator;
 import cn.hellp.touch.unitem.auxiliary.ERROR;
 import cn.hellp.touch.unitem.selector.EmptySelector;
 import cn.hellp.touch.unitem.selector.ISelector;
+import cn.hellp.touch.unitem.selector.tools.ArraySelector;
 
 import java.util.List;
 
@@ -33,8 +34,7 @@ public class FuncCall implements Parser,CodeNode,Operator {
 		for (int i = 0; i < args0.length; i++) {
 			args0[i]=args[i].eval(env);
 		}
-		new CallableActuator(actuator,args0).call(env.getCaller());
-		return new EmptySelector();
+		return new ArraySelector(new CallableActuator(actuator,args0).call(env.getCaller()));
 	}
 
 

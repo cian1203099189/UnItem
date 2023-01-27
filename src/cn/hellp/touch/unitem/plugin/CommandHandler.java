@@ -35,7 +35,7 @@ public class CommandHandler implements CommandExecutor {
                             return true;
                         }
                         try {
-                            SkillManager.invokeSkill(player, args[1]);
+                            SkillManager.invokeSkill(player, args[1], null);
                         } catch (Exception e) {
                             sender.sendMessage("Couldn't invoke the skill "+args[1]+".");
                             sender.sendMessage("Please check the console and the config(s).");
@@ -53,7 +53,7 @@ public class CommandHandler implements CommandExecutor {
                             return true;
                         }
                         try {
-                            SkillManager.invokeSkill(player, args[1]);
+                            SkillManager.invokeSkill(player, args[1], null);
                         } catch (Exception e) {
                             sender.sendMessage("Couldn't invoke the skill "+args[1]+".");
                             sender.sendMessage("Please check the console and the config(s).");

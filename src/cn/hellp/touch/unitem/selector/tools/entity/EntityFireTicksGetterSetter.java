@@ -2,10 +2,15 @@ package cn.hellp.touch.unitem.selector.tools.entity;
 
 import cn.hellp.touch.unitem.auxiliary.GetterSetter;
 import cn.hellp.touch.unitem.auxiliary.Number;
+import cn.hellp.touch.unitem.selector.ISelector;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
 public class EntityFireTicksGetterSetter extends GetterSetter<Entity> {
+    public EntityFireTicksGetterSetter(ISelector<?> target) {
+        super(target);
+    }
+
     @NotNull
     @Override
     public String actuatorID() {

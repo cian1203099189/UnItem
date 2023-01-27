@@ -7,15 +7,15 @@ import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PlaceholderManager {
+public class VarManager {
     private final Map<String, Var> placeholderMap = new HashMap<>();
-    private PlaceholderManager parent;
+    private VarManager parent;
 
-    public PlaceholderManager getParent() {
+    public VarManager getParent() {
         return parent;
     }
 
-    public void setParent(PlaceholderManager parent) {
+    public void setParent(VarManager parent) {
         this.parent = parent;
     }
 
@@ -62,12 +62,12 @@ public class PlaceholderManager {
 
 
     @Override
-    public PlaceholderManager clone() {
-        PlaceholderManager placeholderManager = new PlaceholderManager();
+    public VarManager clone() {
+        VarManager varManager = new VarManager();
         for (String key : placeholderMap.keySet()) {
-            placeholderManager.putVar(new String(key.toCharArray()), getVar(key));
+            varManager.putVar(new String(key.toCharArray()), getVar(key));
         }
-        return placeholderManager;
+        return varManager;
     }
 
     public void replace(String name,ISelector<?> o) {

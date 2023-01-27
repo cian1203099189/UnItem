@@ -4,6 +4,7 @@ import cn.hellp.touch.unitem.app.parser.ParseReader;
 import cn.hellp.touch.unitem.app.parser.block.CodeBlock;
 import cn.hellp.touch.unitem.plugin.Main;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -63,10 +64,10 @@ public class SkillManager {
         return skillMap.containsKey(name);
     }
 
-    public static void invokeSkill(Player invoker,String name) {
+    public static void invokeSkill(Player invoker, String name, Event event) {
         Skill skill = getSkill(name);
         if(skill!=null) {
-            skill.call(invoker);
+            skill.call(invoker,event);
         } else {
             Main.getMainLogger().warning("can't call skill "+name+" on player "+invoker.getName()+"("+invoker.getUniqueId()+") , because it was not found.");
         }

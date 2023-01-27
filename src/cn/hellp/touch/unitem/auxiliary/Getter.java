@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Getter<T> implements ISelector{
-    private final ISelector<?> target;
+    protected final ISelector<?> target;
 
     public Getter(ISelector<?> target) {
         this.target = target;

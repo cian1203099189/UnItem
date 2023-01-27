@@ -5,6 +5,7 @@ import cn.hellp.touch.unitem.actuator.PerformCommandActuator;
 import cn.hellp.touch.unitem.actuator.block.SetBlockTypeActuator;
 import cn.hellp.touch.unitem.actuator.entity.*;
 import cn.hellp.touch.unitem.actuator.entity.player.SetGameModeActuator;
+import cn.hellp.touch.unitem.actuator.entity.player.TakeItemActuator;
 import cn.hellp.touch.unitem.actuator.itemstack.SetItemStackDisplayNameActuator;
 import cn.hellp.touch.unitem.actuator.itemstack.SetItemStackTypeActuator;
 import cn.hellp.touch.unitem.auxiliary.ERROR;
@@ -74,6 +75,12 @@ public class Registry<T> {
         ACTUATOR.register(actuator.actuatorID(), actuator);
         actuator = new SetItemStackDisplayNameActuator();
         ACTUATOR.register(actuator.actuatorID(), actuator);
+        actuator = new LaunchProjectileActuator();
+        ACTUATOR.register(actuator.actuatorID(), actuator);
+        actuator = new SpawnEntityActuator();
+        ACTUATOR.register(actuator.actuatorID(), actuator);
+        actuator = new TakeItemActuator();
+        ACTUATOR.register(actuator.actuatorID(), actuator);
 
         GetterSetter<?> getterSetter;
         getterSetter = new cn.hellp.touch.unitem.selector.tools.player.PlayerCanFlyGetterSetter();
@@ -103,19 +110,19 @@ public class Registry<T> {
         getterSetter = new cn.hellp.touch.unitem.selector.tools.player.PlayerTimeGetterSetter();
         ACTUATOR.register(actuator.actuatorID(), getterSetter);
         SELECTOR.register(getterSetter.selectorID(), createFactoryFromClass(getterSetter.getClass()));
-        getterSetter = new cn.hellp.touch.unitem.selector.tools.entity.living.LivingEntityKillerGetterSetter();
+        getterSetter = new cn.hellp.touch.unitem.selector.tools.entity.living.LivingEntityKillerGetterSetter(null);
         ACTUATOR.register(actuator.actuatorID(), getterSetter);
         SELECTOR.register(getterSetter.selectorID(), createFactoryFromClass(getterSetter.getClass()));
-        getterSetter = new cn.hellp.touch.unitem.selector.tools.entity.living.LivingEntityRemainingAirGetterSetter();
+        getterSetter = new cn.hellp.touch.unitem.selector.tools.entity.living.LivingEntityRemainingAirGetterSetter(null);
         ACTUATOR.register(actuator.actuatorID(), getterSetter);
         SELECTOR.register(getterSetter.selectorID(), createFactoryFromClass(getterSetter.getClass()));
-        getterSetter = new cn.hellp.touch.unitem.selector.tools.entity.EntityCustomNameGetterSetter();
+        getterSetter = new cn.hellp.touch.unitem.selector.tools.entity.EntityCustomNameGetterSetter(null);
         ACTUATOR.register(actuator.actuatorID(), getterSetter);
         SELECTOR.register(getterSetter.selectorID(), createFactoryFromClass(getterSetter.getClass()));
-        getterSetter = new cn.hellp.touch.unitem.selector.tools.entity.EntityFireTicksGetterSetter();
+        getterSetter = new cn.hellp.touch.unitem.selector.tools.entity.EntityFireTicksGetterSetter(null);
         ACTUATOR.register(actuator.actuatorID(), getterSetter);
         SELECTOR.register(getterSetter.selectorID(), createFactoryFromClass(getterSetter.getClass()));
-        getterSetter = new cn.hellp.touch.unitem.selector.tools.entity.EntityVelocityGetterSetter();
+        getterSetter = new cn.hellp.touch.unitem.selector.tools.entity.EntityVelocityGetterSetter(null);
         ACTUATOR.register(getterSetter.actuatorID(), getterSetter);
         SELECTOR.register(getterSetter.selectorID(), createFactoryFromClass(getterSetter.getClass()));
 

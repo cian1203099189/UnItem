@@ -1,6 +1,6 @@
 package cn.hellp.touch.unitem.app.parser.block;
 
-import cn.hellp.touch.unitem.app.PlaceholderManager;
+import cn.hellp.touch.unitem.app.VarManager;
 import cn.hellp.touch.unitem.app.parser.CodeNode;
 import cn.hellp.touch.unitem.app.parser.ParseReader;
 import cn.hellp.touch.unitem.app.parser.UEnv;
@@ -47,7 +47,7 @@ public class CodeBlock implements Block{
         final int length = nodes.size();
         try {
             UEnv env1 = new UEnv(env.getCaller());
-            PlaceholderManager manager1 = new PlaceholderManager();
+            VarManager manager1 = new VarManager();
             manager1.setParent(env.getManager());
             env1.setManager(manager1);
             for (; line < length; line++) {
@@ -55,6 +55,9 @@ public class CodeBlock implements Block{
                 if(env1.isSkipped() || env1.isStopped()) {
                     env.setSkipped(env1.isSkipped());
                     env.setStopped(env1.isStopped());
+                    break;
+                }
+                if(env1.isContinued()) {
                     break;
                 }
             }

@@ -1,5 +1,6 @@
 package cn.hellp.touch.unitem.app.parser.statement;
 
+import cn.hellp.touch.unitem.app.VarManager;
 import cn.hellp.touch.unitem.app.parser.CodeNode;
 import cn.hellp.touch.unitem.app.parser.ParseReader;
 import cn.hellp.touch.unitem.app.parser.UEnv;
@@ -41,6 +42,7 @@ public class ForStatement implements Block {
     @Override
     public ISelector<?> eval(UEnv env) {
         int min,max;
+        UEnv env1 = env.createChildEnv();
         if(Main.getSetting("for-MaxRange").asBoolean()) {
             min = min((Object[]) range1.eval(env).select(env.getCaller()));
             max = max(((Object[]) range2.eval(env).select(env.getCaller())));
@@ -50,8 +52,12 @@ public class ForStatement implements Block {
         }
         final int step = max>min ? 1 : -1;
         for ( ; min!=max ; min+=step) {
-            var.assign(env,new ValueSelector<>(new Number(min)));
-            body.eval(env);
+            var.assign(env1,new ValueSelector<>(new Number(min)));
+            body.eval(env1);
+            if(env1.isSkipped() || env1.isStopped()) {
+                env.setStopped(env1.isStopped());
+                break;
+            }
         }
         return new EmptySelector();
     }
@@ -61,20 +67,14 @@ public class ForStatement implements Block {
         StatementParser sp = new StatementParser();
         var = (LiteralNode) new LiteralNode().parser(reader);
         reader.eatAllSpace();
-        //System.out.println(reader.read());
         if(!reader.has()) {
             throw new ERROR("Unexpected ending of the text");
         }
         reader.eat(2); //in
-        //System.out.println(reader.read());
         reader.eatAllSpace();
-        //System.out.println(reader.read());
         reader.eat(5); //range
-        //System.out.println(reader.read());
         reader.eatAllSpace();
-        //System.out.println(reader.read());
-        reader.eat();
-        //System.out.println(reader.read());
+        reader.eat(); //(
         List<CodeNode> range = ((ArgumentNode) new ArgumentNode('(').parser(reader)).getAll();
         if(range.size()<2) {
             throw new ERROR("Invalid range for for in range().");

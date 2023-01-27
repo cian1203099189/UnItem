@@ -2,10 +2,15 @@ package cn.hellp.touch.unitem.selector.tools.entity.living;
 
 import cn.hellp.touch.unitem.auxiliary.GetterSetter;
 import cn.hellp.touch.unitem.auxiliary.Number;
+import cn.hellp.touch.unitem.selector.ISelector;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
 public class LivingEntityRemainingAirGetterSetter extends GetterSetter<LivingEntity> {
+    public LivingEntityRemainingAirGetterSetter(ISelector<?> target) {
+        super(target);
+    }
+
     @NotNull
     @Override
     public String actuatorID() {

@@ -1,19 +1,41 @@
 package cn.hellp.touch.unitem.app.parser;
 
-import cn.hellp.touch.unitem.app.PlaceholderManager;
+import cn.hellp.touch.unitem.app.VarManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-public class UEnv {
-    private PlaceholderManager manager = new PlaceholderManager();
+public class UEnv implements Cloneable {
+    private VarManager manager = new VarManager();
     private Player caller;
     private boolean skipped = false;
     private boolean stopped = false;
+    private boolean continued = false;
+
+    public boolean isContinued() {
+        return continued;
+    }
+
+    public void setContinued(boolean continued) {
+        this.continued = continued;
+    }
+
+    public UEnv createChildEnv() {
+        try {
+            UEnv env = (UEnv) this.clone();
+            VarManager manager1 = new VarManager();
+            manager1.setParent(manager);
+            env.setManager(manager1);
+            return env;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private @Nullable Event event;
 
-    public UEnv(PlaceholderManager manager) {
+    public UEnv(VarManager manager) {
         this.manager = manager;
     }
 
@@ -46,11 +68,11 @@ public class UEnv {
         return caller;
     }
 
-    public PlaceholderManager getManager() {
+    public VarManager getManager() {
         return manager;
     }
 
-    public void setManager(PlaceholderManager manager) {
+    public void setManager(VarManager manager) {
         this.manager = manager;
     }
 

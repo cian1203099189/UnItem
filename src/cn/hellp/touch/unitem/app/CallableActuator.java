@@ -20,25 +20,27 @@ public class CallableActuator {
         Collections.addAll(pragmas, selectors);
     }
 
-    public void call(Player caller) {
+    public Object[] call(Player caller) {
         Object[][] temp = new Object[pragmas.size()][];
         int length = Integer.MAX_VALUE;
         for (int i = 0; i < pragmas.size(); i++) {
             temp[i]=pragmas.get(i).select(caller);
             length=Math.min(length,temp[i].length);
         }
+        List<Object> result = new ArrayList<>();
         Object[] pragma = new Object[pragmas.size()];
         for (int i = 0; i < length; i++) {
             for (int j = 0; j < pragmas.size(); j++) {
                 pragma[j]=temp[j][i];
             }
             try {
-                actuator.actuate(pragma);
+                result.add(actuator.actuate(pragma));
             } catch (Exception e) {
                 Main.getMainLogger().warning("can't use actuator \""+actuator.actuatorID()+"\" with ");
                 e.printStackTrace();
             }
         }
+        return result.toArray(new Object[0]);
     }
 
 

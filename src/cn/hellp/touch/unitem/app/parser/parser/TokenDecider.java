@@ -167,5 +167,7 @@ public class TokenDecider implements Parser {
         TokenDecider.identifiers.put("true", (reader, last) -> new KeywordNode(new ValueSelector<>(true)));
         TokenDecider.identifiers.put("false", (reader, last) -> new KeywordNode(new ValueSelector<>(false)));
         TokenDecider.identifiers.put("cancel",(reader, last) -> new CancelEvent());
+        TokenDecider.identifiers.put("continue",(reader, last1) -> new Continue());
+        TokenDecider.identifiers.put("while",(reader, last1) -> new WhileStatement().parser(reader));
     }
 }

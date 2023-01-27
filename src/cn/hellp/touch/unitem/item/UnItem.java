@@ -7,14 +7,14 @@ import cn.hellp.touch.unitem.plugin.Main;
 import cn.hellp.touch.unitem.trigger.Trigger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class UnItem {
     private final Map<Trigger.Timing, List<String>> triggerMap = new HashMap<>();
@@ -50,17 +50,24 @@ public class UnItem {
         return bukkitIndex;
     }
 
+    private static final Set<String> updatedUnItemSet = new HashSet<>();
+
     public static void update() {
+        updatedUnItemSet.clear();
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            if (onlinePlayer.getOpenInventory()!=null && !(onlinePlayer.getOpenInventory().getTopInventory() instanceof PlayerInventory)) {
-                for (int i = 0; i < onlinePlayer.getOpenInventory().getTopInventory().getSize() ; i++) {
-                    ItemStack itemStack1 = onlinePlayer.getOpenInventory().getItem(i);
-                    updateIfIsUnItem(itemStack1, onlinePlayer, i);
+            int offset = 0;
+            if (onlinePlayer.getOpenInventory()!=null) {
+                Inventory top = onlinePlayer.getOpenInventory().getTopInventory();
+                offset = top.getSize() - 1;
+                for (int i = 0; i < top.getSize(); i++) {
+                    ItemStack itemStack = top.getItem(i);
+                    updateIfIsUnItem(itemStack,onlinePlayer,i);
                 }
             }
-            for (int i = 0; i < onlinePlayer.getInventory().getSize(); i++) {
-                ItemStack itemStack1 = onlinePlayer.getInventory().getItem(i);
-                updateIfIsUnItem(itemStack1, onlinePlayer, toProtocolIndex(i));
+            Inventory playerInventory = onlinePlayer.getInventory();
+            for (int i = offset; i < playerInventory.getSize() + offset; i++) {
+                ItemStack itemStack1 = onlinePlayer.getInventory().getItem(onlinePlayer.getOpenInventory().convertSlot(i));
+                updateIfIsUnItem(itemStack1, onlinePlayer, i);
             }
         }
     }
@@ -73,7 +80,12 @@ public class UnItem {
                 Object container = ChannelInjector.getField(ChannelInjector.craftInventoryView, player.getOpenInventory(), "container");
                 int windowId = (int) ChannelInjector.getField(ChannelInjector.container, container, ChannelInjector.versionSupport.getWindowIdFiledName());
                 ItemStack itemStack1 = new ItemStack(itemStack.getType());
-                itemStack1.setItemMeta(((ItemBuilder) unItem.getItemBuilder()).update(player, itemStack));
+                if (!updatedUnItemSet.contains(name)) {
+                    updatedUnItemSet.add(name);
+                    itemStack1.setItemMeta(((ItemBuilder) unItem.getItemBuilder()).update(player, itemStack));
+                } else {
+                    itemStack1.setItemMeta(((ItemBuilder) unItem.getItemBuilder()).now(player, itemStack));
+                }
                 Object packet = createUpdateSlotPacket(windowId, slot, itemStack1);
                 ChannelInjector.callMethod(ChannelInjector.playerConnectionClass, ChannelInjector.versionSupport.getSendPacketMethodName(), ChannelInjector.getPlayerConnection(player), new Class[]{ChannelInjector.packetClass}, packet);
             }
@@ -117,12 +129,12 @@ public class UnItem {
         triggerMap.put(timing, skill);
     }
 
-    public void call(Player caller, Trigger.Timing timing) {
+    public void call(Player caller, Trigger.Timing timing,@Nullable Event event) {
         if (!triggerMap.containsKey(timing) || triggerMap.get(timing).isEmpty()) {
             return;
         }
         for (String s : triggerMap.get(timing)) {
-            SkillManager.invokeSkill(caller, s);
+            SkillManager.invokeSkill(caller, s , event);
         }
     }
 }
