@@ -46,10 +46,7 @@ public class CodeBlock implements Block{
         int line = 0 ;
         final int length = nodes.size();
         try {
-            UEnv env1 = new UEnv(env.getCaller());
-            VarManager manager1 = new VarManager();
-            manager1.setParent(env.getManager());
-            env1.setManager(manager1);
+            UEnv env1 = env.createChildEnv();
             for (; line < length; line++) {
                 nodes.get(line).eval(env1);
                 if(env1.isSkipped() || env1.isStopped()) {

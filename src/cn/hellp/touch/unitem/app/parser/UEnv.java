@@ -47,7 +47,7 @@ public class UEnv implements Cloneable {
         return event;
     }
 
-    public void setEvent(Event event) {
+    public void setEvent(@Nullable Event event) {
         this.event = event;
     }
 

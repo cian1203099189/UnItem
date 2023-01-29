@@ -56,11 +56,12 @@ public class IfStatement implements Block {
 
     @Override
     public ISelector<?> eval(UEnv env) {
+        UEnv env1 = env.createChildEnv();
         for (Object condition : Condition.eval(env).select(env.getCaller())) {
             if(((Boolean) condition)) {
-                If.eval(env);
+                If.eval(env1);
             } else if (Else != null) {
-                Else.eval(env);
+                Else.eval(env1);
             }
         }
         return null;
