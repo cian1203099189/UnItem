@@ -1,0 +1,23 @@
+<project name="UnItem" default="build">
+    <path id="project.lib">
+        <fileset dir="lib">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+	<target name="build">
+		<mkdir dir="out"/>
+		<mkdir dir="out/compile"/>
+		<javac srcdir="src" destdir="out/compile" encoding="UTF-8" includeantruntime="false">
+				<classpath refid="project.lib"/>
+		</javac>
+		<copy todir="out/compile">
+			<fileset dir="src">
+				<exclude name="**/**.java"/>
+			</fileset>
+		</copy>
+        <jar destfile="out/UnItem.jar" basedir="out/compile">
+	        <zipfileset src="lib/itemsadder-api.jar"/>
+    		<zipfileset src="lib/VaultAPI.jar" />
+        </jar>
+	</target>
+</project>
