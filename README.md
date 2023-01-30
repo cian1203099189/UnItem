@@ -32,10 +32,4 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  ```
- 
- 
- 依赖获取:
- * spigot1.12.2 API [点击跳转](https://github.com/Akarin-project/Akarin/archive/refs/tags/1.12.2-R0.4.3.zip)
- * Placeholder API [点击跳转](https://www.spigotmc.org/resources/placeholderapi.6245/)
- * ItemsAdder API [点击跳转](https://github.com/LoneDev6/API-ItemsAdder/packages/613535?version=3.2.5)
- * Vault API [点击跳转](https://repo.minebench.de/com/github/MilkBowl/VaultAPI/1.7.1/VaultAPI-1.7.1.jar)
+
